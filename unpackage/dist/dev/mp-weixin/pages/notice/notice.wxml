@@ -1,1 +1,0 @@
-<view><view class="notice-item"><view class="content"><rich-text class="rich_text" nodes="{{contents}}"></rich-text></view></view></view>
