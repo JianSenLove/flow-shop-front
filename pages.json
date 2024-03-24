@@ -137,6 +137,12 @@
 					"bounce": "none"
 				}
 			}
+        },
+		{
+            "path" : "pages/product/flowerIdentify",
+            "style" : {
+				"navigationBarTitleText": "花卉识别"
+			}
         }
     ],
 	"globalStyle": {
