@@ -89,7 +89,7 @@
 						title: '登录成功',
 						duration: 2000,
 						success: () => {
-							uni.navigateTo({ url: '/pages/index/index' });
+							uni.navigateBack();
 						}
 					});
 				} else {

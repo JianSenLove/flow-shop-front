@@ -25,11 +25,37 @@
 		data() {
 			return {
 				sizeCalcState: false,
-				tabScrollTop: 0,
-				currentId: 1,
-				flist: [],
-				slist: [],
-				tlist: [],
+        tabScrollTop: 0,
+        currentId: 1, // 假设默认当前选中的分类ID
+        // 一级分类
+        flist: [
+            { id: 1, name: "分类1" },
+            { id: 2, name: "分类2" },
+            { id: 3, name: "分类3" }
+        ],
+        // 二级分类
+        slist: [
+            { id: 1, name: "分类a", top: 0 }, // 假设的top值，需要实际计算
+            { id: 2, name: "分类b", top: 100 }, // 假设的top值
+            { id: 3, name: "分类c", top: 200 }  // 假设的top值
+        ],
+        // 三级分类，与二级分类ID相关联
+        tlist: [
+            { id: 101, pid: 1, name: "子分类1-1", picture: "https://example.com/pic1.jpg" },
+            { id: 102, pid: 1, name: "子分类1-2", picture: "https://example.com/pic2.jpg" },
+            { id: 201, pid: 2, name: "子分类2-1", picture: "https://example.com/pic3.jpg" },
+            { id: 202, pid: 2, name: "子分类2-2", picture: "https://example.com/pic4.jpg" },
+            { id: 301, pid: 2, name: "子分类3-1", picture: "https://example.com/pic5.jpg" },
+            { id: 302, pid: 2, name: "子分类3-2", picture: "https://example.com/pic6.jpg" },
+			{ id: 1231, pid: 2, name: "子分类2-1", picture: "https://example.com/pic3.jpg" },
+			{ id: 123123, pid: 2, name: "子分类2-2", picture: "https://example.com/pic4.jpg" },
+			{ id: 123123, pid: 2, name: "子分类3-1", picture: "https://example.com/pic5.jpg" },
+			{ id: 123123, pid: 2, name: "子分类3-2", picture: "https://example.com/pic6.jpg" },
+			{ id: 2223, pid: 2, name: "子分类2-1", picture: "https://example.com/pic3.jpg" },
+			{ id: 3222, pid: 2, name: "子分类2-2", picture: "https://example.com/pic4.jpg" },
+			{ id: 13333, pid: 3, name: "子分类3-1", picture: "https://example.com/pic5.jpg" },
+			{ id: 2555, pid: 3, name: "子分类3-2", picture: "https://example.com/pic6.jpg" }
+        ],
 			}
 		},
 		onLoad(){
@@ -39,20 +65,20 @@
 			async loadData(){
 				let data={}
 				let than=this;
-				api.post("Labels/xcxList",data).then(resp=>{
-					let list = resp.data;
-					this.currentId=resp.data[0].id;
-					// console.log(list)
-					list.forEach(item=>{
-						if(!item.pid){
-							than.flist.push(item);  //pid为父级id, 没有pid或者pid=0是一级分类
-							than.slist.push(item);
-						}else{
-							// console.log(3)
-							than.tlist.push(item); //3级分类
-						}
-					})
-				})
+				// api.post("Labels/xcxList",data).then(resp=>{
+				// 	let list = resp.data;
+				// 	this.currentId=resp.data[0].id;
+				// 	// console.log(list)
+				// 	list.forEach(item=>{
+				// 		if(!item.pid){
+				// 			than.flist.push(item);  //pid为父级id, 没有pid或者pid=0是一级分类
+				// 			than.slist.push(item);
+				// 		}else{
+				// 			// console.log(3)
+				// 			than.tlist.push(item); //3级分类
+				// 		}
+				// 	})
+				// })
 			},
 			//一级分类点击
 			tabtap(item,index){
