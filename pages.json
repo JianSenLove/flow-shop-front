@@ -1,23 +1,12 @@
 {
 	"pages": [
-{
-			"path": "pages/public/login",
-			"style": {
-				"navigationBarTitleText": "",
-				"navigationStyle": "custom",
-				"app-plus": {
-					"titleNView": false,
-					"animationType": "slide-in-bottom"
-				}
-			}
-		},
 		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "商城"
-				//"navigationStyle": "custom",
+            "path" : "pages/product/list",
+            "style" : {
+				"enablePullDownRefresh": true,
+				"navigationBarTitleText": "商品列表"
 			}
-		},
+        },
 		{
 			"path": "pages/product/product",
 			"style": {
@@ -34,7 +23,17 @@
 				"navigationBarTitleText": "设置"
 			}
 		},
-
+		{
+			"path": "pages/public/login",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom",
+				"app-plus": {
+					"titleNView": false,
+					"animationType": "slide-in-bottom"
+				}
+			}
+		},
 		{
 			"path": "pages/userinfo/userinfo",
 			"style": {
@@ -139,13 +138,6 @@
 				}
 			}
         }
-        ,{
-            "path" : "pages/product/list",
-            "style" : {
-				"enablePullDownRefresh": true,
-				"navigationBarTitleText": "商品列表"
-			}
-        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
@@ -159,7 +151,7 @@
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
 		"list": [{
-				"pagePath": "pages/index/index",
+				"pagePath": "pages/product/list",
 				"iconPath": "static/tab-home.png",
 				"selectedIconPath": "static/tab-home-current.png",
 				"text": "首页"

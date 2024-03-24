@@ -88,72 +88,14 @@
 		onShow() {
 			let userInfo = uni.getStorageSync('userInfo');
 			this.userInfo=userInfo;
-			// console.log(userInfo)
-			this.login();
-			
 		},
 		
         
         methods: {
-			//登录
-			login() {
-				let _self = this;
-				// 1. wx 获取登录用户 code
-				uni.login({
-					provider: 'weixin',
-					success: loginRes => {
-						_self.xcxcode = loginRes.code;
-						// console.log(loginRes)
-					},
-					fail: () => {
-						return false;
-					}
-				});
-				return false;
-			},
 			//获取用户信息
 			wxGetUserInfo() {
-				let _self = this;
-				uni.getUserProfile({
-					provider: 'weixin',
-					desc: '获取用户完整信息',
-					success: (infoRes) => {
-						console.log(infoRes.userInfo)
-						// _self.userInfo = infoRes.userInfo
-						//提示
-						uni.showLoading({
-							title: '正在登录',
-							mask: true
-						});
-						// 2.提交数据到后台
-						api.post('User/getOpenid', {
-							"code": _self.xcxcode,
-							"name": infoRes.userInfo.nickName,
-							"logo": infoRes.userInfo.avatarUrl,
-							"sex":infoRes.userInfo.gender
-						})
-						.then(res => {
-							uni.hideLoading();
-							if(res.code==200){
-								uni.setStorageSync("userInfo", res.data);
-								_self.userInfo =res.data;
-							}else{
-								uni.showToast({
-									title: '登录失败失败',
-									icon: 'none'
-								});
-							}
-						})
-					},
-					fail(res) {
-						uni.showToast({
-							title: '获取用户信息失败',
-							icon: 'none'
-						});
-					}
-				});
-				
-				return false
+				uni.navigateTo({ url: '/pages/public/login' });
+				this.userInfo = uni.getStorageSync('userInfo');
 			},
 			Jump(e){
 				if(this.userInfo){
@@ -165,6 +107,7 @@
 						title: '用户信息未登录！',
 						icon: 'none'
 					});
+					uni.navigateTo({ url: '/pages/public/login' });
 				}
 				
 			},

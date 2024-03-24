@@ -1,25 +1,16 @@
 <template>
 	<view class="content">
-		<view class="navbar" :style="{position:headerPosition,top:headerTop}">
-			<view class="nav-item" :class="{current: filterIndex == 0}" @click="tabClick(0)">
-				综合排序
-			</view>
-			<view class="nav-item" :class="{current: filterIndex == 1}" @click="tabClick(1)">
-				新品上市
-			</view>
-			<view class="nav-item" :class="{current: filterIndex == 2}" @click="tabClick(2)">
-				热销推荐
-			</view>
-			<view class="nav-item" :class="{current: filterIndex == 3}" @click="tabClick(3)">
-				销量优先
-			</view>
+		<view class="search-section">
+			<uni-section>
+				<uni-search-bar placeholder="搜索商品" @confirm="search" :focus="true" v-model="searchValue" @blur="blur"
+					@focus="focus" @input="input" @cancel="cancel" @clear="clear">
+				</uni-search-bar>
+
+			</uni-section>
+			<button class="confirm-btn" @click="identify" :disabled="logining">花卉识别功能</button>
 		</view>
 		<view class="goods-list">
-			<view 
-				v-for="(item, index) in goodsList" :key="index"
-				class="goods-item"
-				@click="navToDetailPage(item)"
-			>
+			<view v-for="(item, index) in goodsList" :key="index" class="goods-item" @click="navToDetailPage(item)">
 				<view class="image-wrapper">
 					<image :src="item.ioc" mode="aspectFill"></image>
 				</view>
@@ -31,9 +22,9 @@
 			</view>
 		</view>
 		<uni-load-more :status="loadingType"></uni-load-more>
-		
-		
-		
+
+
+
 	</view>
 </template>
 
@@ -42,315 +33,249 @@
 	import api from '../../common/api.js'
 	export default {
 		components: {
-			uniLoadMore	
+			uniLoadMore
 		},
 		data() {
 			return {
+				searchValue: '123123',
 				cateMaskState: 0, //分类面板展开状态
-				headerPosition:"fixed",
-				headerTop:"0px",
+				headerPosition: "fixed",
+				headerTop: "0px",
 				loadingType: 'more', //加载更多状态
-				filterIndex: 0, 
+				filterIndex: 0,
 				cateId: 0, //分类id
-				goodsList: [],
-				page:1,
+				goodsList: [{
+						id: 1,
+						ioc: 'https://example.com/image1.jpg',
+						title: '商品标题1',
+						price: '99.00',
+						aid: '150'
+					},
+					{
+						id: 2,
+						ioc: 'https://example.com/image2.jpg',
+						title: '商品标题2',
+						price: '199.00',
+						aid: '80'
+					},
+					{
+						id: 3,
+						ioc: 'https://example.com/image2.jpg',
+						title: '商品标题3',
+						price: '199.00',
+						aid: '80'
+					},
+					{
+						id: 2,
+						ioc: 'https://example.com/image2.jpg',
+						title: '商品标题4',
+						price: '199.00',
+						aid: '80'
+					},
+					// 可以根据需要添加更多测试商品数据
+				],
+				page: 1,
 			};
 		},
-		
-		onLoad(options){
+
+		onLoad(options) {
 			this.cateId = options.sid;
-			this.filterIndex=options.tid;
-		console.log(options)
+			this.filterIndex = options.tid;
 			this.loadData();
-		},
-		onPageScroll(e){
-			//兼容iOS端下拉时顶部漂移
-			if(e.scrollTop>=0){
-				this.headerPosition = "fixed";
-			}else{
-				this.headerPosition = "absolute";
-			}
+			this.loadingType = 'noMore';
 		},
 		//下拉刷新
-		onPullDownRefresh(){
-			this.page=1;
+		onPullDownRefresh() {
+			this.page = 1;
 			this.loadData('refresh');
 		},
 		//加载更多
-		onReachBottom(){
-			this.page=this.page+1;
+		onReachBottom() {
+			this.page = this.page + 1;
 			this.loadData();
 		},
 		methods: {
-			
+			search(res) {
+				uni.showToast({
+					title: '搜索：' + res.value,
+					icon: 'none'
+				})
+			},
+			input(res) {},
+			clear(res) {
+				uni.showToast({
+					title: 'clear事件，清除值为：' + res.value,
+					icon: 'none'
+				})
+			},
+			cancel(res) {
+				uni.showToast({
+					title: '点击取消，输入值为：' + res.value,
+					icon: 'none'
+				})
+			},
+
 			//加载商品 ，带下拉刷新和上滑加载
-			async loadData(type='add', loading) {
+			async loadData(type = 'add', loading) {
 				//没有更多直接返回
-				if(type === 'add'){
-					if(this.loadingType === 'nomore'){
+				if (type === 'add') {
+					if (this.loadingType === 'nomore') {
 						return;
 					}
 					this.loadingType = 'loading';
-				}else{
+				} else {
 					this.loadingType = 'more'
 				}
-				
-				
-				let data={
-					"page":this.page,
-					"limit":20,
-					"lx":this.filterIndex,
-					"labelsid":this.cateId
+
+
+				let data = {
+					"page": this.page,
+					"limit": 2,
+					"lx": this.filterIndex,
+					"labelsid": this.cateId
 				}
-				api.post('Goods/xcxlist', data).then(res => {
-					// console.log(res)
-					if(res.code==200){
-						let goodsList = res.data;
-						if(type === 'refresh'){
-							this.goodsList = [];
-						}
-						//筛选，测试数据直接前端筛选了
-						if(this.filterIndex === 1){
-							goodsList.sort((a,b)=>b.sales - a.sales)
-						}
-						if(this.filterIndex === 2){
-							goodsList.sort((a,b)=>{
-								if(this.priceOrder == 1){
-									return a.price - b.price;
-								}
-								return b.price - a.price;
-							})
-						}
-						
-						this.goodsList = this.goodsList.concat(goodsList);
-						
-						//判断是否还有下一页，有是more  没有是nomore(测试数据判断大于20就没有了)
-						this.loadingType  = this.goodsList.length > 20 ? 'nomore' : 'more';
-						if(type === 'refresh'){
-							if(loading == 1){
-								uni.hideLoading()
-							}else{
-								uni.stopPullDownRefresh();
-							}
-						}
-					}else{
-						
-					}
-					
-					
-					
-				})
-				
-				
-				
+
 			},
-			//筛选点击
-			tabClick(index){
-				if(this.filterIndex === index && index !== 2){
-					return;
-				}
-				this.filterIndex = index;
-				if(index === 2){
-					this.priceOrder = this.priceOrder === 1 ? 2: 1;
-				}else{
-					this.priceOrder = 0;
-				}
-				uni.pageScrollTo({
-					duration: 300,
-					scrollTop: 0
-				})
-				this.page=1;
-				this.loadData('refresh', 1);
-				uni.showLoading({
-					title: '正在加载'
-				})
-			},
-			
-			goodlist(){
-				
+
+			goodlist() {
+
 			},
 			//详情
-			navToDetailPage(item){
+			navToDetailPage(item) {
 				//测试数据没有写id，用title代替
 				let id = item.id;
 				uni.navigateTo({
 					url: `/pages/product/product?id=${id}`
 				})
 			},
-			stopPrevent(){}
+			stopPrevent() {}
 		},
 	}
 </script>
 
 <style lang="scss">
-	page, .content{
+	page,
+	.content {
 		background: $page-color-base;
 	}
-	.content{
-		padding-top: 96upx;
-	}
 
-	.navbar{
-		position: fixed;
-		left: 0;
-		top: var(--window-top);
-		display: flex;
-		width: 100%;
-		height: 80upx;
-		background: #fff;
-		box-shadow: 0 2upx 10upx rgba(0,0,0,.06);
-		z-index: 10;
-		.nav-item{
-			flex: 1;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			height: 100%;
-			font-size: 30upx;
-			color: $font-color-dark;
-			position: relative;
-			&.current{
-				color: $base-color;
-				&:after{
-					content: '';
-					position: absolute;
-					left: 50%;
-					bottom: 0;
-					transform: translateX(-50%);
-					width: 120upx;
-					height: 0;
-					border-bottom: 4upx solid $base-color;
-				}
-			}
-		}
-		.p-box{
-			display: flex;
-			flex-direction: column;
-			.yticon{
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				width: 30upx;
-				height: 14upx;
-				line-height: 1;
-				margin-left: 4upx;
-				font-size: 26upx;
-				color: #888;
-				&.active{
-					color: $base-color;
-				}
-			}
-			.xia{
-				transform: scaleY(-1);
-			}
-		}
-		.cate-item{
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			height: 100%;
-			width: 80upx;
-			position: relative;
-			font-size: 44upx;
-			&:after{
-				content: '';
-				position: absolute;
-				left: 0;
-				top: 50%;
-				transform: translateY(-50%);
-				border-left: 1px solid #ddd;
-				width: 0;
-				height: 36upx;
-			}
+	.content {
+		padding-top: 5upx;
+	}
+	
+	.confirm-btn {
+		width: 630upx;
+		height: 76upx;
+		line-height: 76upx;
+		border-radius: 50px;
+		margin-top: 20upx;
+		background: $uni-color-success;
+		color: #fff;
+		font-size: $font-lg;
+	
+		&:after {
+			border-radius: 100px;
 		}
 	}
 
 	/* 分类 */
-	.cate-mask{
+	.cate-mask {
 		position: fixed;
 		left: 0;
 		top: var(--window-top);
 		bottom: 0;
 		width: 100%;
-		background: rgba(0,0,0,0);
+		background: rgba(0, 0, 0, 0);
 		z-index: 95;
 		transition: .3s;
-		
-		.cate-content{
+
+		.cate-content {
 			width: 630upx;
 			height: 100%;
 			background: #fff;
-			float:right;
+			float: right;
 			transform: translateX(100%);
 			transition: .3s;
 		}
-		&.none{
+
+		&.none {
 			display: none;
 		}
-		&.show{
-			background: rgba(0,0,0,.4);
-			
-			.cate-content{
+
+		&.show {
+			background: rgba(0, 0, 0, .4);
+
+			.cate-content {
 				transform: translateX(0);
 			}
 		}
 	}
-	.cate-list{
+
+	.cate-list {
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		.cate-item{
+
+		.cate-item {
 			display: flex;
 			align-items: center;
 			height: 90upx;
 			padding-left: 30upx;
- 			font-size: 28upx;
+			font-size: 28upx;
 			color: #555;
 			position: relative;
 		}
-		.two{
+
+		.two {
 			height: 64upx;
 			color: #303133;
 			font-size: 30upx;
 			background: #f8f8f8;
 		}
-		.active{
+
+		.active {
 			color: $base-color;
 		}
 	}
 
 	/* 商品列表 */
-	.goods-list{
-		display:flex;
-		flex-wrap:wrap;
+	.goods-list {
+		display: flex;
+		flex-wrap: wrap;
 		padding: 0 30upx;
 		background: #fff;
-		.goods-item{
-			display:flex;
+
+		.goods-item {
+			display: flex;
 			flex-direction: column;
 			width: 48%;
 			padding-bottom: 40upx;
-			&:nth-child(2n+1){
+
+			&:nth-child(2n+1) {
 				margin-right: 4%;
 			}
 		}
-		.image-wrapper{
+
+		.image-wrapper {
 			width: 100%;
 			height: 330upx;
 			border-radius: 3px;
 			overflow: hidden;
-			image{
+
+			image {
 				width: 100%;
 				height: 100%;
 				opacity: 1;
 			}
 		}
-		.title{
+
+		.title {
 			font-size: $font-lg;
 			color: $font-color-dark;
 			line-height: 80upx;
 		}
-		.price-box{
+
+		.price-box {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
@@ -358,16 +283,16 @@
 			font-size: 24upx;
 			color: $font-color-light;
 		}
-		.price{
+
+		.price {
 			font-size: $font-lg;
 			color: $uni-color-primary;
 			line-height: 1;
-			&:before{
+
+			&:before {
 				content: '￥';
 				font-size: 26upx;
 			}
 		}
 	}
-	
-
 </style>
