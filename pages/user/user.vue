@@ -15,7 +15,7 @@
 			<view class="vip-card-box">
 				<image class="card-bg" src="/static/vip-card-bg.png" mode=""></image>
 				
-				<text class="e-m">DCloud Union</text>
+				<text class="e-m">flower-shop</text>
 				<text class="e-b">欢迎你进入商城</text>
 			</view>
 		</view>

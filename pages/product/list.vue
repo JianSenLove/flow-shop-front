@@ -43,35 +43,42 @@ export default {
 			headerPosition: "fixed",
 			headerTop: "0px",
 			loadingType: 'more', //加载更多状态
-			goodsList: [{
-				id: 1,
-				image: 'https://example.com/image1.jpg',
-				name: '商品标题1',
-				price: '99.00',
-				stock: '150'
-			},
-			{
-				id: 2,
-				image: 'https://example.com/image2.jpg',
-				name: '商品标题2',
-				price: '199.00',
-				stock: '80'
-			},
-			{
-				id: 3,
-				image: 'https://example.com/image2.jpg',
-				name: '商品标题3',
-				price: '199.00',
-				stock: '80'
-			},
-			{
-				id: 2,
-				image: 'https://example.com/image2.jpg',
-				name: '商品标题4',
-				price: '199.00',
-				stock: '80'
-			},
-				// 可以根据需要添加更多测试商品数据
+			goodsList: [
+							{
+								id: 1,
+								image: 'https://example.com/image1.jpg',
+								name: '植物1',
+								price: '99.00',
+								stock: '150'
+							},
+							{
+								id: 2,
+								image: 'https://example.com/image2.jpg',
+								name: '植物2',
+								price: '199.00',
+								stock: '80'
+							},
+							{
+								id: 3,
+								image: 'https://example.com/image3.jpg',
+								name: '花卉3',
+								price: '299.00',
+								stock: '60'
+							},
+							{
+								id: 4,
+								image: 'https://example.com/image4.jpg',
+								name: '绿植4',
+								price: '399.00',
+								stock: '40'
+							},
+							{
+								id: 5,
+								image: 'https://example.com/image5.jpg',
+								name: '多肉植物5',
+								price: '49.00',
+								stock: '200'
+							}
 			],
 			page: 1,
 		};
@@ -187,7 +194,8 @@ page,
 	height: 76upx;
 	line-height: 76upx;
 	border-radius: 50px;
-	margin-top: 20upx;
+	margin-top: 10upx;
+	margin-bottom: 20upx;
 	background: $uni-color-success;
 	color: #fff;
 	font-size: $font-lg;
@@ -231,6 +239,7 @@ page,
 }
 
 .cate-list {
+	
 	display: flex;
 	flex-direction: column;
 	height: 100%;
