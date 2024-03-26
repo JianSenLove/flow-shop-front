@@ -87,17 +87,12 @@
 </template>
 
 <script>
-	import api from '../../common/api.js'
+	import {getGoodsDetail} from '@/common/restApi.js'
 	export default {
 		components: {},
 		data() {
 			return {
-				detail: { // 商品详情
-					name: '商品名称',
-					desc: '商品描述',
-					image: 'https://example.com/images/product.jpg',
-					price: 36, // 商品价格
-					stock: 20, // 商品库存
+				detail: {
 				},
 				mun: 1, // 用户选择购买的商品数量
 				specClass: 'none', // 控制规格选择模态框的显示与隐藏
@@ -125,7 +120,6 @@
 			addReduce(id) {
 
 				if (id == 0) {
-					console.log(id)
 					if (this.mun > 1) {
 						this.mun = this.mun - 1;
 					}
@@ -136,11 +130,20 @@
 				}
 			},
 			// 获取数据
-			getDetail() {
-				
+			async getDetail() {
+				this.detail = await getGoodsDetail(this.id);
 			},
 			buy(e) {
-				
+			  // e为1时，表示用户点击的是“立即购买”
+			  if (e === 1) {
+			    // 进行立即购买的逻辑处理
+			    // 这里可以是跳转到订单创建界面的代码
+			    uni.navigateTo({
+			      url: '/pages/order/createOrder?productId=' + this.id 
+			    });
+			  } else if (e === 0) {
+
+			  }
 			},
 			stopPrevent() {}
 		},
