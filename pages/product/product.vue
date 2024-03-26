@@ -32,7 +32,7 @@
 				<text class="con t-r "></text>
 				<text class="con t-r "></text>
 				<text class="con t-r jishuq" @click="addReduce(0)">-</text>
-				<text class="con t-r jishuq">{{mun}}</text>
+				<text class="con t-r jishuq">{{num}}</text>
 				<text class="con t-r jishuq" @click="addReduce(1)">+</text>
 			</view>
 			<view class="c-row b-b">
@@ -87,14 +87,14 @@
 </template>
 
 <script>
-	import {getGoodsDetail} from '@/common/restApi.js'
+	import {getGoodsDetail,addCart} from '@/common/restApi.js'
 	export default {
 		components: {},
 		data() {
 			return {
 				detail: {
 				},
-				mun: 1, // 用户选择购买的商品数量
+				num: 1, // 用户选择购买的商品数量
 				specClass: 'none', // 控制规格选择模态框的显示与隐藏
 			};
 		},
@@ -120,12 +120,12 @@
 			addReduce(id) {
 
 				if (id == 0) {
-					if (this.mun > 1) {
-						this.mun = this.mun - 1;
+					if (this.num > 1) {
+						this.num = this.num - 1;
 					}
 				} else {
-					if (this.mun < this.specList.stock) {
-						this.mun = this.mun + 1;
+					if (this.num < this.detail.stock) {
+						this.num = this.num + 1;
 					}
 				}
 			},
@@ -138,11 +138,24 @@
 			  if (e === 1) {
 			    // 进行立即购买的逻辑处理
 			    // 这里可以是跳转到订单创建界面的代码
+				let detailsArray = [];
+				this.detail.num = this.num;
+				this.detail.productId = this.detail.id;
+				delete this.detail.id;
+				detailsArray.push(this.detail);
+				uni.setStorageSync('orderData', JSON.stringify(detailsArray));
 			    uni.navigateTo({
-			      url: '/pages/order/createOrder?productId=' + this.id 
+			      url: '/pages/order/createOrder?productId=' + this.id  + '&num=' + this.num
 			    });
 			  } else if (e === 0) {
-
+				  const cart = {
+				  	productId: this.id,
+				  	quantity: num
+				  };
+				  addCart(cart);
+				  uni.showToast({
+				  	title: '加入购物车成功'
+				  })
 			  }
 			},
 			stopPrevent() {}

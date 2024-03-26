@@ -34,6 +34,11 @@ export const deleteCart = (goodsId) => {
 	});
 };
 
+// 创建用户订单接口
+export const createOrder = (order) => {
+	return api.post('/mirageLedger/v1/order', order);
+};
+
 // 查询用户订单接口
 export const getOrderList = () => {
 	return api.get('/order/list');
