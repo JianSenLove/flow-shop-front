@@ -13,18 +13,18 @@ export const getGoodsDetail = (id) => {
 };
 
 // 获取分类列表
-export const getCategoryList = () => {
-	return api.get('/category/list');
+export const getCategoryList = (params) => {
+	return api.get('/mirageLedger/v1/category',params);
 };
 
 // 根据用户ID获取购物车
-export const getCartList = () => {
-	return api.get('/cart/list');
+export const getCartList = (params) => {
+	return api.get('/mirageLedger/v1/cart',params);
 };
 
 // 添加商品到购物车
 export const addCart = (cart) => {
-	return api.post('/cart/add', cart);
+	return api.post('/mirageLedger/v1/cart', cart);
 };
 
 // 删除购物车商品
@@ -39,9 +39,9 @@ export const createOrder = (order) => {
 	return api.post('/mirageLedger/v1/order', order);
 };
 
-// 查询用户订单接口
-export const getOrderList = () => {
-	return api.get('/order/list');
+// 分页查询用户订单接口
+export const getOrderList = (params) => {
+	return api.get('/mirageLedger/v1/order', params);
 };
 
 // 查询用户收货地址接口

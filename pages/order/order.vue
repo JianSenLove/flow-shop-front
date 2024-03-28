@@ -1,79 +1,64 @@
 <template>
 	<view class="content">
 		<view class="navbar">
-			<view 
-				v-for="(item, index) in navList" :key="index" 
-				class="nav-item" 
-				:class="{current: tabCurrentIndex == index}"
-				@click="tabClick(index)"
-			>
+			<view v-for="(item, index) in navList" :key="index" class="nav-item"
+				:class="{current: tabCurrentIndex == index}" @click="tabClick(index)">
 				{{item.text}}
 			</view>
 		</view>
 
 		<swiper :current="tabCurrentIndex" class="swiper-box" duration="300" @change="changeTab">
 			<swiper-item class="tab-content" v-for="(tabItem,tabIndex) in navList" :key="tabIndex">
-				<scroll-view 
-					class="list-scroll-content" 
-					scroll-y
-					@scrolltolower="loadData"
-				>
-				
+				<scroll-view class="list-scroll-content" scroll-y @scrolltolower="loadData">
+
 					<!-- 空白页 -->
-					<empty v-if="orderList.length === 0"></empty>
-					
+					<empty v-if="tabItem.orderList.length === 0"></empty>
+
 					<!-- 订单列表 -->
-					<view v-if="orderList.length>0"
-						v-for="(item,index) in orderList" :key="index"
-						class="order-item"
-					>
+					<view v-if="tabItem.orderList.length>0" v-for="(item,index) in tabItem.orderList" :key="index" class="order-item">
 						<view class="i-top b-b">
-							<text class="time">{{item.order.ctime}}</text>
-							<text class="state">{{item.status}}</text>
-							<text 
-								class="del-btn yticon icon-iconfontshanchu1"
-								@click="deleteOrder(index,item.order.id)"
-							></text>
+							<text class="time">{{ item.createTime }}</text>
+							<text class="state">{{ item.status }}</text>
+							<text class="del-btn yticon icon-iconfontshanchu1"
+								@click="deleteOrder(index, item.id)"></text>
 						</view>
-						
-						<view 
-							class="goods-box-single"
-							v-for="(goodsItem, goodsIndex) in item.goodsList" :key="goodsIndex"
-							@click="navToDetailPage(item.order.id)"
-						>
-							<image class="goods-img" :src="goodsItem.ioc" mode="aspectFill"></image>
+
+						<view class="goods-box-single" v-for="(goodsItem, goodsIndex) in item.orderProducts"
+							:key="goodsIndex" @click="navToDetailPage(item.id)">
+							<image class="goods-img" :src="goodsItem.image" mode="aspectFill"></image>
 							<view class="right">
-								<text class="title clamp">{{goodsItem.title}}</text>
-								<text class="attr-box">{{goodsItem.specsname}} / {{goodsItem.fitname}}  x {{goodsItem.mun}}</text>
+								<text class="title clamp">{{ goodsItem.productName }}</text>
+								<text class="attr-box">
+									X {{goodsItem.num}}</text>
 								<text class="price">{{goodsItem.price}}</text>
 							</view>
-							
+
 						</view>
-						
+
 						<view class="price-box">
 							共
-							<text class="num">{{item.goodsList.length}}</text>
+							<text class="num">{{item.orderProducts.length}}</text>
 							件商品 实付款
-							<text class="price">{{pay(item.goodsList)}}</text>
+							<text class="price">{{pay(item.orderProducts)}}</text>
 						</view>
-						<!-- <view class="action-box b-t" v-if="item.order.p_status==0 ">
+						<view class="action-box b-t" v-if="item.order.status">
 							<button class="action-btn" @click="cancelOrder(item.order.id)">取消订单</button>
 							<button class="action-btn recom">立即支付</button>
-						</view> -->
+						</view>
 					</view>
-					 
+
 					<!-- <uni-load-more :status="tabItem.loadingType"></uni-load-more> -->
-					
+
 				</scroll-view>
 			</swiper-item>
 		</swiper>
 	</view>
-</template> 
+</template>
 
 <script>
 	import uniLoadMore from '@/components/uni-load-more/uni-load-more.vue';
 	import empty from "@/components/empty";
-	import api from '../../common/api.js'
+	import {getOrderList} from '@/common/restApi.js'
 	export default {
 		components: {
 			uniLoadMore,
@@ -82,8 +67,7 @@
 		data() {
 			return {
 				tabCurrentIndex: 0,
-				page:1,
-				orderList:[],
+				statusMap : ['', '待付款', '待收货', '已签收', '售后'],
 				navList: [{
 						state: 0,
 						text: '全部',
@@ -117,100 +101,87 @@
 				],
 			};
 		},
-		
-		onLoad(options){
-			console.log(options)
-			this.tabCurrentIndex =options.state;
+
+		onLoad(options) {
+			this.tabCurrentIndex = options.state;
 			this.loadData()
-			
+
 		},
-		 
+
 		methods: {
 			//获取订单列表
-			loadData(source){
-				let data={
-					"uid":uni.getStorageSync('userInfo').id,
-					"state":this.tabCurrentIndex
-				}
-				console.log(data)
-				api.post('Order/xcxlist', data).then(res => {
-					console.log(res)
-					if(res.code==200){
-						this.orderList=res.data
-					}
-					
-				})
-				
-				
-			}, 
+			async loadData() {
+				let pageParams = {
+					status: this.statusMap[this.tabCurrentIndex],
+					page: 1,
+					rows: 999
+				};
+				let response = await getOrderList(pageParams);
+				this.navList[this.tabCurrentIndex].orderList = response.records
+			},
 
 			//swiper 切换
-			changeTab(e){
+			changeTab(e) {
 				this.tabCurrentIndex = e.target.current;
 				this.loadData('tabChange');
 			},
 			//顶部tab点击
-			tabClick(index){
+			tabClick(index) {
 				this.tabCurrentIndex = index;
 			},
 			//删除订单
-			deleteOrder(index,id){
-				console.log(index,id)
-				
+			deleteOrder(index, id) {
+				//调用删除订单
+
+				// 重新刷新列表
+
 				uni.showLoading({
-					title: '请稍后'
+					title: '取消订单成功'
 				})
-				api.post('Order/del', {"id":id}).then(res => {
-					console.log(res)
-					
-				})
-				setTimeout(()=>{
-					this.orderList.splice(index, 1);
-					uni.hideLoading();
-				}, 600)
-				
-				
+
+
 			},
 			//取消订单
-			cancelOrder(id){
+			cancelOrder(id) {
 				uni.showLoading({
 					title: '请稍后'
 				})
-				api.post('Order/qu', {"id":id}).then(res => {
-					console.log(res)
-					uni.hideLoading();
-					this.loadData();
-				})
+				//调用删除订单
 			},
-			
-			
+
+
 			//订单状态文字和颜色
-			orderStateExp(state){
+			orderStateExp(state) {
 				let stateTip = '',
 					stateTipColor = '#fa436a';
-				switch(+state){
+				switch (+state) {
 					case 1:
-						stateTip = '待付款'; break;
+						stateTip = '待付款';
+						break;
 					case 2:
-						stateTip = '待发货'; break;
+						stateTip = '待发货';
+						break;
 					case 9:
-						stateTip = '订单已关闭'; 
+						stateTip = '订单已关闭';
 						stateTipColor = '#909399';
 						break;
-						
-					//更多自定义
+
+						//更多自定义
 				}
-				return {stateTip, stateTipColor};
+				return {
+					stateTip,
+					stateTipColor
+				};
 			},
-			pay(list){
+			pay(list) {
 				let price = 0;
-				list.forEach(item=>{
-						price += item.price * item.mun+item.freight;
-					
+				list.forEach(item => {
+					price += item.price * item.num;
+
 				})
 				return price;
 			},
-			
+
 			//详情页
 			navToDetailPage(id) {
 				uni.navigateTo({
@@ -222,27 +193,30 @@
 </script>
 
 <style lang="scss">
-	page, .content{
+	page,
+	.content {
 		background: $page-color-base;
 		height: 100%;
 	}
-	
-	.swiper-box{
+
+	.swiper-box {
 		height: calc(100% - 40px);
 	}
-	.list-scroll-content{
+
+	.list-scroll-content {
 		height: 100%;
 	}
-	
-	.navbar{
+
+	.navbar {
 		display: flex;
 		height: 40px;
 		padding: 0 5px;
 		background: #fff;
-		box-shadow: 0 1px 5px rgba(0,0,0,.06);
+		box-shadow: 0 1px 5px rgba(0, 0, 0, .06);
 		position: relative;
 		z-index: 10;
-		.nav-item{
+
+		.nav-item {
 			flex: 1;
 			display: flex;
 			justify-content: center;
@@ -251,9 +225,11 @@
 			font-size: 15px;
 			color: $font-color-dark;
 			position: relative;
-			&.current{
+
+			&.current {
 				color: $base-color;
-				&:after{
+
+				&:after {
 					content: '';
 					position: absolute;
 					left: 50%;
@@ -267,35 +243,41 @@
 		}
 	}
 
-	.uni-swiper-item{
+	.uni-swiper-item {
 		height: auto;
 	}
-	.order-item{
+
+	.order-item {
 		display: flex;
 		flex-direction: column;
 		padding-left: 30upx;
 		background: #fff;
 		margin-top: 16upx;
-		.i-top{
+
+		.i-top {
 			display: flex;
 			align-items: center;
 			height: 80upx;
-			padding-right:30upx;
+			padding-right: 30upx;
 			font-size: $font-base;
 			color: $font-color-dark;
 			position: relative;
-			.time{
+
+			.time {
 				flex: 1;
 			}
-			.state{
+
+			.state {
 				color: $base-color;
 			}
-			.del-btn{
+
+			.del-btn {
 				padding: 10upx 0 10upx 36upx;
 				font-size: $font-lg;
 				color: $font-color-light;
 				position: relative;
-				&:after{
+
+				&:after {
 					content: '';
 					width: 0;
 					height: 30upx;
@@ -307,52 +289,62 @@
 				}
 			}
 		}
+
 		/* 多条商品 */
-		.goods-box{
+		.goods-box {
 			height: 160upx;
 			padding: 20upx 0;
 			white-space: nowrap;
-			.goods-item{
+
+			.goods-item {
 				width: 120upx;
 				height: 120upx;
 				display: inline-block;
 				margin-right: 24upx;
 			}
-			.goods-img{
+
+			.goods-img {
 				display: block;
 				width: 100%;
 				height: 100%;
 			}
 		}
+
 		/* 单条商品 */
-		.goods-box-single{
+		.goods-box-single {
 			display: flex;
 			padding: 20upx 0;
-			.goods-img{
+
+			.goods-img {
 				display: block;
 				width: 120upx;
 				height: 120upx;
 			}
-			.right{
+
+			.right {
 				flex: 1;
 				display: flex;
 				flex-direction: column;
 				padding: 0 30upx 0 24upx;
 				overflow: hidden;
-				.title{
+
+				.title {
 					font-size: $font-base + 2upx;
 					color: $font-color-dark;
 					line-height: 1;
 				}
-				.attr-box{
+
+				.attr-box {
 					font-size: $font-sm + 2upx;
 					color: $font-color-light;
 					padding: 10upx 12upx;
 				}
-				.price{
+
+				.price {
 					font-size: $font-base + 2upx;
 					color: $font-color-dark;
-					&:before{
+
+					&:before {
 						content: '￥';
 						font-size: $font-sm;
 						margin: 0 2upx 0 8upx;
@@ -360,29 +352,33 @@
 				}
 			}
 		}
-		
-		.price-box{
+
+		.price-box {
 			display: flex;
 			justify-content: flex-end;
 			align-items: baseline;
 			padding: 20upx 30upx;
 			font-size: $font-sm + 2upx;
 			color: $font-color-light;
-			.num{
+
+			.num {
 				margin: 0 8upx;
 				color: $font-color-dark;
 			}
-			.price{
+
+			.price {
 				font-size: $font-lg;
 				color: $font-color-dark;
-				&:before{
+
+				&:before {
 					content: '￥';
 					font-size: $font-sm;
 					margin: 0 2upx 0 8upx;
 				}
 			}
 		}
-		.action-box{
+
+		.action-box {
 			display: flex;
 			justify-content: flex-end;
 			align-items: center;
@@ -390,7 +386,8 @@
 			position: relative;
 			padding-right: 30upx;
 		}
-		.action-btn{
+
+		.action-btn {
 			width: 160upx;
 			height: 60upx;
 			margin: 0;
@@ -402,20 +399,23 @@
 			color: $font-color-dark;
 			background: #fff;
 			border-radius: 100px;
-			&:after{
+
+			&:after {
 				border-radius: 100px;
 			}
-			&.recom{
+
+			&.recom {
 				background: #fff9f9;
 				color: $base-color;
-				&:after{
+
+				&:after {
 					border-color: #f7bcc8;
 				}
 			}
 		}
 	}
-	
-	
+
+
 	/* load-more */
 	.uni-load-more {
 		display: flex;
@@ -424,22 +424,22 @@
 		align-items: center;
 		justify-content: center
 	}
-	
+
 	.uni-load-more__text {
 		font-size: 28upx;
 		color: #999
 	}
-	
+
 	.uni-load-more__img {
 		height: 24px;
 		width: 24px;
 		margin-right: 10px
 	}
-	
+
 	.uni-load-more__img>view {
 		position: absolute
 	}
-	
+
 	.uni-load-more__img>view view {
 		width: 6px;
 		height: 2px;
@@ -451,98 +451,98 @@
 		transform-origin: 50%;
 		animation: load 1.56s ease infinite
 	}
-	
+
 	.uni-load-more__img>view view:nth-child(1) {
 		transform: rotate(90deg);
 		top: 2px;
 		left: 9px
 	}
-	
+
 	.uni-load-more__img>view view:nth-child(2) {
 		transform: rotate(180deg);
 		top: 11px;
 		right: 0
 	}
-	
+
 	.uni-load-more__img>view view:nth-child(3) {
 		transform: rotate(270deg);
 		bottom: 2px;
 		left: 9px
 	}
-	
+
 	.uni-load-more__img>view view:nth-child(4) {
 		top: 11px;
 		left: 0
 	}
-	
+
 	.load1,
 	.load2,
 	.load3 {
 		height: 24px;
 		width: 24px
 	}
-	
+
 	.load2 {
 		transform: rotate(30deg)
 	}
-	
+
 	.load3 {
 		transform: rotate(60deg)
 	}
-	
+
 	.load1 view:nth-child(1) {
 		animation-delay: 0s
 	}
-	
+
 	.load2 view:nth-child(1) {
 		animation-delay: .13s
 	}
-	
+
 	.load3 view:nth-child(1) {
 		animation-delay: .26s
 	}
-	
+
 	.load1 view:nth-child(2) {
 		animation-delay: .39s
 	}
-	
+
 	.load2 view:nth-child(2) {
 		animation-delay: .52s
 	}
-	
+
 	.load3 view:nth-child(2) {
 		animation-delay: .65s
 	}
-	
+
 	.load1 view:nth-child(3) {
 		animation-delay: .78s
 	}
-	
+
 	.load2 view:nth-child(3) {
 		animation-delay: .91s
 	}
-	
+
 	.load3 view:nth-child(3) {
 		animation-delay: 1.04s
 	}
-	
+
 	.load1 view:nth-child(4) {
 		animation-delay: 1.17s
 	}
-	
+
 	.load2 view:nth-child(4) {
 		animation-delay: 1.3s
 	}
-	
+
 	.load3 view:nth-child(4) {
 		animation-delay: 1.43s
 	}
-	
+
 	@-webkit-keyframes load {
 		0% {
 			opacity: 1
 		}
-	
+
 		100% {
 			opacity: .2
 		}

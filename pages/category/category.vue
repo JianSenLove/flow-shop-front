@@ -1,16 +1,19 @@
 <template>
 	<view class="content">
 		<scroll-view scroll-y class="left-aside">
-			<view v-for="(item,index) in flist" :key="item.id" class="f-item b-b" :class="{active: item.id === currentId}" @click="tabtap(item,index)">
+			<view v-for="(item,index) in flist" :key="item.id" class="f-item b-b"
+				:class="{active: item.id === currentId}" @click="tabtap(item,index)">
 				{{item.name}}
 			</view>
 		</scroll-view>
-		<scroll-view scroll-with-animation scroll-y class="right-aside" @scroll="asideScroll" :scroll-top="tabScrollTop">
+		<scroll-view scroll-with-animation scroll-y class="right-aside" @scroll="asideScroll"
+			:scroll-top="tabScrollTop">
 			<view v-for="item in slist" :key="item.id" class="s-list" :id="'main-'+item.id">
 				<text class="s-item">{{item.name}}</text>
 				<view class="t-list">
-					<view @click="navToList(titem.id)" v-if="titem.pid === item.id" class="t-item" v-for="titem in tlist" :key="titem.id">
-						<image :src="titem.picture"></image>
+					<view @click="navToList(titem.id)" v-if="titem.categoryId === item.id" class="t-item"
+						v-for="titem in tlist" :key="titem.id">
+						<image :src="titem.image"></image>
 						<text>{{titem.name}}</text>
 					</view>
 				</view>
@@ -20,95 +23,80 @@
 </template>
 
 <script>
-	import api from '../../common/api.js'
+	import {
+		getCategoryList
+	} from '@/common/restApi.js'
 	export default {
 		data() {
 			return {
 				sizeCalcState: false,
-        tabScrollTop: 0,
-        currentId: 1, // 假设默认当前选中的分类ID
-        // 一级分类
-        flist: [
-            { id: 1, name: "分类1" },
-            { id: 2, name: "分类2" },
-            { id: 3, name: "分类3" }
-        ],
-        // 二级分类
-        slist: [
-            { id: 1, name: "分类a", top: 0 }, // 假设的top值，需要实际计算
-            { id: 2, name: "分类b", top: 100 }, // 假设的top值
-            { id: 3, name: "分类c", top: 200 }  // 假设的top值
-        ],
-        // 三级分类，与二级分类ID相关联
-        tlist: [
-            { id: 101, pid: 1, name: "子分类1-1", picture: "https://example.com/pic1.jpg" },
-            { id: 102, pid: 1, name: "子分类1-2", picture: "https://example.com/pic2.jpg" },
-            { id: 201, pid: 2, name: "子分类2-1", picture: "https://example.com/pic3.jpg" },
-            { id: 202, pid: 2, name: "子分类2-2", picture: "https://example.com/pic4.jpg" },
-            { id: 301, pid: 2, name: "子分类3-1", picture: "https://example.com/pic5.jpg" },
-            { id: 302, pid: 2, name: "子分类3-2", picture: "https://example.com/pic6.jpg" },
-			{ id: 1231, pid: 2, name: "子分类2-1", picture: "https://example.com/pic3.jpg" },
-			{ id: 123123, pid: 2, name: "子分类2-2", picture: "https://example.com/pic4.jpg" },
-			{ id: 123123, pid: 2, name: "子分类3-1", picture: "https://example.com/pic5.jpg" },
-			{ id: 123123, pid: 2, name: "子分类3-2", picture: "https://example.com/pic6.jpg" },
-			{ id: 2223, pid: 2, name: "子分类2-1", picture: "https://example.com/pic3.jpg" },
-			{ id: 3222, pid: 2, name: "子分类2-2", picture: "https://example.com/pic4.jpg" },
-			{ id: 13333, pid: 3, name: "子分类3-1", picture: "https://example.com/pic5.jpg" },
-			{ id: 2555, pid: 3, name: "子分类3-2", picture: "https://example.com/pic6.jpg" }
-        ],
+				tabScrollTop: 0,
+				currentId: 1, // 假设默认当前选中的分类ID
+				// 一级分类
+				flist: [],
+				// 二级分类
+				slist: [],
+				// 三级分类，与二级分类ID相关联
+				tlist: [],
 			}
 		},
-		onLoad(){
+		onLoad() {
 			this.loadData();
 		},
 		methods: {
-			async loadData(){
-				let data={}
-				let than=this;
-				// api.post("Labels/xcxList",data).then(resp=>{
-				// 	let list = resp.data;
-				// 	this.currentId=resp.data[0].id;
-				// 	// console.log(list)
-				// 	list.forEach(item=>{
-				// 		if(!item.pid){
-				// 			than.flist.push(item);  //pid为父级id, 没有pid或者pid=0是一级分类
-				// 			than.slist.push(item);
-				// 		}else{
-				// 			// console.log(3)
-				// 			than.tlist.push(item); //3级分类
-				// 		}
-				// 	})
-				// })
+			async loadData() {
+				let params = {
+					page: 1,
+					rows: 99
+				};
+				let response = await getCategoryList(params);
+				this.flist = response.records; // 假设一级分类和二级分类数据结构相同，仅作展示用
+
+				// 重构二级分类（slist）的加载逻辑，使其包含对应的产品信息
+				this.slist = response.records.map(item => {
+					return {
+						...item, // 展开原始二级分类信息
+						products: item.products || [], // 确保每个二级分类都有products数组
+					};
+				});
+
+				// 计算每个二级分类的top值，便于滚动定位
+				let temp = 0;
+				this.slist.forEach(item => {
+					item.top = temp;
+					// 假设每个二级分类区块的高度是由其产品数量决定的，这里简化为每个产品占据100的高度
+					temp += item.products.length * 100; // 根据产品数量动态调整高度
+				});
 			},
 			//一级分类点击
-			tabtap(item,index){
-				if(!this.sizeCalcState){
+			tabtap(item, index) {
+				if (!this.sizeCalcState) {
 					this.calcSize();
 				}
-				
+
 				this.currentId = item.id;
 				// console.log(item.id)
-				// let index = this.slist.findIndex(sitem=>sitem.pid === item.id);
-				
+				// let index = this.slist.findIndex(sitem=>sitem.categoryId === item.id);
+
 				this.tabScrollTop = this.slist[index].top;
 			},
 			//右侧栏滚动
-			asideScroll(e){
-				if(!this.sizeCalcState){
+			asideScroll(e) {
+				if (!this.sizeCalcState) {
 					this.calcSize();
 				}
 				let scrollTop = e.detail.scrollTop;
 				// console.log(scrollTop)
-				let tabs = this.slist.filter(item=>item.top <= scrollTop).reverse();
+				let tabs = this.slist.filter(item => item.top <= scrollTop).reverse();
 				// console.log(tabs,this.slist,tabs.length)
-				if(tabs.length > 0){
-					this.currentId = tabs[0].pid;
+				if (tabs.length > 0) {
+					this.currentId = tabs[0].categoryId;
 				}
 			},
 			//计算右侧栏每个tab的高度等信息
-			calcSize(){
+			calcSize() {
 				let h = 0;
-				this.slist.forEach(item=>{
+				this.slist.forEach(item => {
 					let view = uni.createSelectorQuery().select("#main-" + item.id);
 					view.fields({
 						size: true
@@ -120,7 +108,7 @@
 				})
 				this.sizeCalcState = true;
 			},
-			navToList(sid){
+			navToList(sid) {
 				uni.navigateTo({
 					url: `/pages/product/list?sid=${sid}&tid=0`
 				})
@@ -139,12 +127,14 @@
 	.content {
 		display: flex;
 	}
+
 	.left-aside {
 		flex-shrink: 0;
 		width: 200upx;
 		height: 100%;
 		background-color: #fff;
 	}
+
 	.f-item {
 		display: flex;
 		align-items: center;
@@ -154,10 +144,12 @@
 		font-size: 28upx;
 		color: $font-color-base;
 		position: relative;
-		&.active{
+
+		&.active {
 			color: $base-color;
 			background: #f8f8f8;
-			&:before{
+
+			&:before {
 				content: '';
 				position: absolute;
 				left: 0;
@@ -172,12 +164,13 @@
 		}
 	}
 
-	.right-aside{
+	.right-aside {
 		flex: 1;
 		overflow: hidden;
 		padding-left: 20upx;
 	}
-	.s-item{
+
+	.s-item {
 		display: flex;
 		align-items: center;
 		height: 70upx;
@@ -185,19 +178,22 @@
 		font-size: 28upx;
 		color: $font-color-dark;
 	}
-	.t-list{
+
+	.t-list {
 		display: flex;
 		flex-wrap: wrap;
 		width: 100%;
 		background: #fff;
 		padding-top: 12upx;
-		&:after{
+
+		&:after {
 			content: '';
 			flex: 99;
 			height: 0;
 		}
 	}
-	.t-item{
+
+	.t-item {
 		flex-shrink: 0;
 		display: flex;
 		justify-content: center;
@@ -207,8 +203,8 @@
 		font-size: 26upx;
 		color: #666;
 		padding-bottom: 20upx;
-		
-		image{
+
+		image {
 			width: 140upx;
 			height: 140upx;
 		}

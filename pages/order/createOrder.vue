@@ -82,7 +82,6 @@
 				userInfo: null,
 				List: [],
 				price: 500, //应付金额
-				total: 400, //商品金额
 				addressData: {
 					name: "张三",
 					mobile: "13800138000",
@@ -114,16 +113,7 @@
 
 				// 更新商品总金额
 				this.total = total;
-
-				// 如果有运费或其他逻辑，也可以在这里处理
-				// 例如，如果运费根据总金额决定，可以在这里添加条件判断
-				// 假设运费逻辑如下：
-				let shippingFee = 0; // 假设免运费
-				// 如果需要运费计算逻辑，可以在这里添加
-				// 如：if (this.total < 300) shippingFee = 20;
-
-				// 更新应付金额（商品总金额 + 运费）
-				this.price = this.total + shippingFee;
+				this.price = parseFloat(this.total.toFixed(2));;
 			},
 			loadData() {
 

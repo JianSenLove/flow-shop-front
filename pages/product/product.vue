@@ -148,9 +148,9 @@
 			      url: '/pages/order/createOrder?productId=' + this.id  + '&num=' + this.num
 			    });
 			  } else if (e === 0) {
-				  const cart = {
+				  let cart = {
 				  	productId: this.id,
-				  	quantity: num
+				  	num: this.num
 				  };
 				  addCart(cart);
 				  uni.showToast({

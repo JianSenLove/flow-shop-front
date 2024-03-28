@@ -42,7 +42,7 @@
 		},
 		data() {
 			return {
-				searchValue: '123123',
+				searchValue: '',
 				cateMaskState: 0, //分类面板展开状态
 				headerPosition: "fixed",
 				headerTop: "0px",

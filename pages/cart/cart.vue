@@ -6,7 +6,7 @@
 			<!-- {{cartList}} -->
 			<view v-if="cartList.length==0" class="empty-tips">
 				空空如也
-				<navigator class="navigator" url="../index/index" open-type="switchTab">随便逛逛></navigator>
+				<navigator class="navigator" url="../product/list" open-type="switchTab">随便逛逛></navigator>
 			</view>
 		</view>
 		<view v-if="!userInfo" class="empty">
@@ -23,17 +23,14 @@
 				<block v-for="(item, index) in cartList" :key="item.id">
 					<view class="cart-item" :class="{'b-b': index!==cartList.length-1}">
 						<view class="image-wrapper">
-							<image :src="item.ioc" :class="[item.loaded]" mode="aspectFill" lazy-load
+							<image :src="item.image" :class="[item.loaded]" mode="aspectFill" lazy-load
 								@load="onImageLoad('cartList', index)" @error="onImageError('cartList', index)"></image>
 							<view class="yticon icon-xuanzhong2 checkbox" :class="{checked: item.checked}"
 								@click="check('item', index)"></view>
 						</view>
 						<view class="item-right">
-							<text class="clamp title">{{item.title}}</text>
-							<text class="attr">{{item.specsname}} / {{item.fitname}}</text>
-							<text class="price">¥{{item.price}}<text class="mun">× {{item.mun}}</text></text>
-
-							<text class="attr">运费:{{item.freight==0 ? "包邮":item.freight}}</text>
+							<text class="clamp title">{{item.productName}}</text>
+							<text class="price">¥{{item.price}}<text class="num">× {{item.num}}</text></text>
 
 						</view>
 						<text class="del-btn yticon icon-fork" @click="deleteCartItem(index)"></text>
@@ -60,7 +57,7 @@
 </template>
 
 <script>
-	import api from '../../common/api.js'
+	import {getCartList} from '@/common/restApi.js'
 	import uniNumberBox from '@/components/uni-number-box.vue'
 	export default {
 		components: {
@@ -76,33 +73,11 @@
 				total: 0, // 总价格，静态数据中可以先设为0，后面根据实际商品计算
 				allChecked: false, // 全选状态 false表示未全选
 				empty: false, // 是否显示空白页，有商品时不显示，无商品时显示
-				cartList: [{
-						id: 1,
-						ioc: 'https://example.com/cart-item1.jpg',
-						title: '商品1',
-						specsname: '规格1',
-						fitname: '型号1',
-						price: 99.99,
-						mun: 1,
-						freight: 0, // 0表示包邮
-						checked: false // 是否被选中
-					},
-					{
-						id: 2,
-						ioc: 'https://example.com/cart-item2.jpg',
-						title: '商品2',
-						specsname: '规格2',
-						fitname: '型号2',
-						price: 199.99,
-						mun: 2,
-						freight: 10, // 非0表示有运费
-						checked: false // 是否被选中
-					}
+				cartList: [
 				],
 			};
 		},
 		onLoad() {
-
 		},
 		onShow() {
 			let userInfo = uni.getStorageSync('userInfo');
@@ -125,29 +100,12 @@
 		methods: {
 			//请求数据
 			async loadData() {
-				// console.log(this.userInfo)
-				// api.post('Cart/list', {
-				// 	"uid": this.userInfo.id
-				// }).then(res => {
-				// 	// console.log(res)
-				// 	if (res.code == 200) {
-				// 		let list = res.data;
-				// 		let cartList = list.map(item => {
-				// 			item.checked = true;
-				// 			return item;
-				// 		});
-				// 		this.cartList = cartList;
-				// 		this.calcTotal();
-				// 	}
-
-				// })
-
-				// let cartList = list.map(item=>{
-				// 	item.checked = true;
-				// 	return item;
-				// });
-				// this.cartList = cartList;
-				//   //计算总价
+				let params = {
+					page: 1,
+					rows: 99
+				}
+				let response = await getCartList(params);
+				this.cartList = response.records
 			},
 			//监听image加载完成
 			onImageLoad(key, index) {
@@ -186,12 +144,7 @@
 				let list = this.cartList;
 				let row = list[index];
 				let id = row.id;
-				api.post('Cart/del', {
-					"id": id
-				}).then(res => {
-					// console.log(res)
-
-				})
+				// 调用接口删除id
 				this.cartList.splice(index, 1);
 				this.calcTotal();
 				uni.hideLoading();
@@ -211,12 +164,7 @@
 								}
 
 							}
-							api.post('Cart/del', {
-								"id": id
-							}).then(res => {
-								// console.log(res)
-
-							})
+							// 调用接口清除购物车
 							this.cartList = [];
 							this.total = 0;
 							this.calcTotal();
@@ -231,17 +179,17 @@
 					this.empty = true;
 					return;
 				}
-				let total = 0;
+				let t = 0;
 				let checked = true;
 				list.forEach(item => {
 					if (item.checked === true) {
-						total += item.price * item.mun + item.freight;
+						t += item.price * item.num;
 					} else if (checked === true) {
 						checked = false;
 					}
 				})
 				this.allChecked = checked;
-				this.total = Number(total.toFixed(2));
+				this.total = parseFloat(t.toFixed(2));;
 			},
 			//创建订单
 			createOrder() {
@@ -463,7 +411,7 @@
 		color: $uni-color-primary;
 	}
 
-	.mun {
+	.num {
 		float: right;
 	}
 </style>
