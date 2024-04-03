@@ -5,7 +5,7 @@
 				<!-- 				<uni-search-bar placeholder="搜索商品" @confirm="search" :focus="true" v-model="searchValue" @blur="blur"
 					@focus="focus" @input="input" @cancel="cancel" @clear="clear">
 				</uni-search-bar> -->
-				<uni-search-bar placeholder="搜索商品" v-model="searchValue">
+				<uni-search-bar placeholder="搜索商品" v-model="searchValue" @confirm="search" @cancel="cancel" @clear="cancel">
 				</uni-search-bar>
 
 			</uni-section>
@@ -66,14 +66,18 @@
 		//加载更多
 		onReachBottom() {
 			this.page = this.page + 1;
-			this.loadData();
+			this.loadData('add',this.searchValue);
 		},
 		methods: {
+			cancel(res) {
+				this.loadData('refresh');
+			},
 			search(res) {
 				uni.showToast({
 					title: '搜索：' + res.value,
 					icon: 'none'
 				})
+				this.loadData('refresh',this.searchValue);
 			},
 			input(res) {},
 			clear(res) {},
