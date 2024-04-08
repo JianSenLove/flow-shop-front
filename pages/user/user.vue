@@ -43,6 +43,10 @@
 					<text class="yticon icon-daifukuan"></text>
 					<text>待付款</text>
 				</view>
+				<view class="order-item" @click="Jump('/pages/order/order?state=3')" hover-class="common-hover"  :hover-stay-time="50">
+					<text class="yticon icon-yishouhuo"></text>
+					<text>待发货</text>
+				</view>
 				<view class="order-item" @click="Jump('/pages/order/order?state=2')" hover-class="common-hover"  :hover-stay-time="50">
 					<text class="yticon icon-yishouhuo"></text>
 					<text>待收货</text>

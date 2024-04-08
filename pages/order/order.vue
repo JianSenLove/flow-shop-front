@@ -67,7 +67,7 @@
 		data() {
 			return {
 				tabCurrentIndex: 0,
-				statusMap : ['', '待付款', '待收货', '已签收', '售后'],
+				statusMap : ['', '待付款', '待收货', '待发货', '售后'],
 				navList: [{
 						state: 0,
 						text: '全部',
@@ -88,7 +88,7 @@
 					},
 					{
 						state: 3,
-						text: '已签收',
+						text: '待发货',
 						loadingType: 'more',
 						orderList: []
 					},
