@@ -30,7 +30,7 @@
 								<text class="title clamp">{{ goodsItem.productName }}</text>
 								<text class="attr-box">
 									X {{goodsItem.num}}</text>
-								<text class="price">{{goodsItem.price}} X {{goodsItem.num}} = ￥{{goodsItem.price * goodsItem.num}}</text>
+								<text class="price">{{goodsItem.price}} X {{goodsItem.num}} = ￥{{parseFloat(goodsItem.price * goodsItem.num).toFixed(2)}}</text>
 							</view>
 
 						</view>
@@ -147,7 +147,7 @@
 				uni.showLoading({
 					title: '请稍后'
 				})
-				//调用删除订单
+				//调用修改订单状态
 			},
 
 
@@ -180,7 +180,7 @@
 					price += item.price * item.num;
 
 				})
-				return price;
+				return parseFloat(price.toFixed(2));
 			},
 
 			//详情页

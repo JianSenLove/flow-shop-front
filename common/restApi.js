@@ -28,10 +28,8 @@ export const addCart = (cart) => {
 };
 
 // 删除购物车商品
-export const deleteCart = (goodsId) => {
-	return api.delete('/cart/delete', {
-		goodsId
-	});
+export const deleteCart = (cartId) => {
+	return api.delete('/cart/delete/' + cartId);
 };
 
 // 创建用户订单接口

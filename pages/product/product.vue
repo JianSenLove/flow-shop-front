@@ -145,7 +145,7 @@
 				detailsArray.push(this.detail);
 				uni.setStorageSync('orderData', JSON.stringify(detailsArray));
 			    uni.navigateTo({
-			      url: '/pages/order/createOrder?productId=' + this.id  + '&num=' + this.num
+			      url: '/pages/order/createOrder'
 			    });
 			  } else if (e === 0) {
 				  let cart = {

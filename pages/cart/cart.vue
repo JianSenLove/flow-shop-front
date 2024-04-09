@@ -66,10 +66,7 @@
 		data() {
 			return {
 				userInfo: {
-					id: 1,
-					name: '测试用户',
-					avatar: '/static/user-avatar.png'
-				}, // 用户信息，设置为null模拟未登录状态
+				},
 				total: 0, // 总价格，静态数据中可以先设为0，后面根据实际商品计算
 				allChecked: false, // 全选状态 false表示未全选
 				empty: false, // 是否显示空白页，有商品时不显示，无商品时显示
@@ -85,7 +82,9 @@
 			if (userInfo) {
 				this.loadData();
 			}
-			this.calcTotal()
+      this.allChecked= false;
+			this.calcTotal();
+      this.total = 0;
 		},
 		watch: {
 			//显示空白页
@@ -189,25 +188,13 @@
 					}
 				})
 				this.allChecked = checked;
-				this.total = parseFloat(t.toFixed(2));;
+				this.total = parseFloat(t.toFixed(2));
 			},
 			//创建订单
 			createOrder() {
-				let list = this.cartList;
-				let id = "";
-				let goodsData = [];
-				list.forEach(item => {
-					if (item.checked) {
-						if (id == "") {
-							id = item.id;
-						} else {
-							id = id + "," + item.id;
-						}
-					}
-				})
-				// console.log(id)
+        uni.setStorageSync('orderData',JSON.stringify(this.cartList));
 				uni.navigateTo({
-					url: `/pages/order/createOrder?id=` + id
+					url: `/pages/order/createOrder`
 				})
 				// this.$api.msg('跳转下一页 sendData');
 			}

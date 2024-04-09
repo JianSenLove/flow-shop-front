@@ -71,7 +71,7 @@
 
 <script>
 	import api from '../../common/api.js'
-	import {createOrder} from '@/common/restApi.js'
+	import {createOrder,deleteCart} from '@/common/restApi.js'
 	export default {
 		data() {
 			return {
@@ -99,7 +99,6 @@
 		},
 		onShow() {
 			this.address();
-
 		},
 		methods: {
 			// 计算总金额
@@ -139,7 +138,14 @@
 				}
 				
 				createOrder(data);
-				
+
+        // 如果ID不为空,调用删除购物车接口
+        // if (this.list[0].id) {
+        //   for (let i = 0; i < this.list.length; i++) {
+        //     deleteCart(this.list[i].id);
+        //   }
+        // }
+
 				uni.showToast({
 					title:"订单创建成功"
 				})
