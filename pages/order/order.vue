@@ -43,8 +43,8 @@
 							<text class="price">{{pay(item.orderProducts)}}</text>
 						</view>
 						<view class="action-box b-t" v-if="item.status == '待付款'">
-							<button class="action-btn" @click="cancelOrder(item.order.id)">取消订单</button>
-							<button class="action-btn recom">立即支付</button>
+							<button class="action-btn" @click="cancelOrder(item.id)">取消订单</button>
+							<button class="action-btn recom" @click="payOrder(item.id)">立即支付</button>
 						</view>
 					</view>
 
@@ -59,7 +59,7 @@
 <script>
 	import uniLoadMore from '@/components/uni-load-more/uni-load-more.vue';
 	import empty from "@/components/empty";
-	import {getOrderList} from '@/common/restApi.js'
+	import {getOrderList,updateOrder,deleteOrder} from '@/common/restApi.js'
 	export default {
 		components: {
 			uniLoadMore,
@@ -133,21 +133,29 @@
 			//删除订单
 			deleteOrder(index, id) {
 				//调用删除订单
-
-				// 重新刷新列表
-
-				uni.showLoading({
-					title: '取消订单成功'
+        deleteOrder(id);
+        this.navList[this.tabCurrentIndex].orderList.splice(index, 1);
+				uni.showToast({
+          icon: 'success',
+					title: '删除订单成功'
 				})
 
 
 			},
 			//取消订单
 			cancelOrder(id) {
-				uni.showLoading({
-					title: '请稍后'
+        //调用修改订单状态
+        updateOrder(id,{status: "已取消"})
+        this.navList[this.tabCurrentIndex].orderList.forEach((item, index) => {
+          if (item.id == id) {
+            item.status = "已取消"
+          }
+        });
+				uni.showToast({
+          icon: 'success',
+					title: '取消订单成功'
 				})
-				//调用修改订单状态
+
 			},
 
 
@@ -182,6 +190,19 @@
 				})
 				return parseFloat(price.toFixed(2));
 			},
+
+      // 立即支付
+      payOrder(id) {
+        updateOrder(id,{status: "待收货"})
+        uni.showToast({
+          title: '支付成功',
+          icon: 'success',
+          duration: 2000
+        });
+        uni.redirectTo({
+          url: '/pages/order/order?state=3'
+        });
+      },
 
 			//详情页
 			navToDetailPage(id) {

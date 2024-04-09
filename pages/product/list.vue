@@ -6,8 +6,11 @@
 				</uni-search-bar>
 
 			</uni-section>
-			<button class="confirm-btn" @click="identify">花卉识别</button>
-			<button class="confirm-btn" @click="recommendation">智能推荐</button>
+      <view class="history-section icon">
+
+         <list-cell icon="icon-share" iconColor="#9789f7" title="花卉识别" @eventClick="identify" ></list-cell>
+         <list-cell icon="icon-pinglun-copy" iconColor="#ee883b" title="智能推荐" @eventClick="recommendation"></list-cell>
+      </view>
 		</view>
 		<view class="goods-list">
 			<view v-for="(item, index) in goodsList" :key="index" class="goods-item" @click="navToDetailPage(item)">
@@ -33,8 +36,10 @@
 	import {
 		getGoodsList
 	} from '@/common/restApi.js';
+  import listCell from "@/components/mix-list-cell.vue";
 	export default {
 		components: {
+      listCell,
 			uniLoadMore
 		},
 		data() {
@@ -277,4 +282,36 @@
 			}
 		}
 	}
+
+  .history-section{
+    padding: 30upx 0 0;
+    margin-top: 20upx;
+    background: #fff;
+    border-radius:10upx;
+    .sec-header{
+      display:flex;
+      align-items: center;
+      font-size: $font-base;
+      color: $font-color-dark;
+      line-height: 40upx;
+      margin-left: 30upx;
+      .yticon{
+        font-size: 44upx;
+        color: #5eba8f;
+        margin-right: 16upx;
+        line-height: 40upx;
+      }
+    }
+    .h-list{
+      white-space: nowrap;
+      padding: 30upx 30upx 0;
+      image{
+        display:inline-block;
+        width: 160upx;
+        height: 160upx;
+        margin-right: 20upx;
+        border-radius: 10upx;
+      }
+    }
+  }
 </style>

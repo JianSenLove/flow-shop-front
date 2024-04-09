@@ -66,6 +66,9 @@
 					item.top = temp;
 					// 假设每个二级分类区块的高度是由其产品数量决定的，这里简化为每个产品占据100的高度
 					temp += item.products.length * 100; // 根据产品数量动态调整高度
+          item.products.forEach(pitem => {
+            this.tlist.push(pitem);
+		  });
 				});
 			},
 			//一级分类点击

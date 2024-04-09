@@ -37,6 +37,16 @@ export const createOrder = (order) => {
 	return api.post('/mirageLedger/v1/order', order);
 };
 
+// 修改用户订单接口
+export const updateOrder = (id,order) => {
+	return api.put('/mirageLedger/v1/order/' + id, order);
+};
+
+// 删除用户订单接口
+export const deleteOrder = (id) => {
+	return api.delete('/mirageLedger/v1/order/' + id);
+};
+
 // 分页查询用户订单接口
 export const getOrderList = (params) => {
 	return api.get('/mirageLedger/v1/order', params);
