@@ -62,7 +62,7 @@ export default {
       // 模拟一个异步请求的响应
       return new Promise((resolve) => {
         setTimeout(() => {
-          resolve({ name: '识别结果名称' });
+          resolve({ name: '不知名花种' });
         }, 1000);
       });
     },

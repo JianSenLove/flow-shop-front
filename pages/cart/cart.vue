@@ -23,8 +23,7 @@
 				<block v-for="(item, index) in cartList" :key="item.id">
 					<view class="cart-item" :class="{'b-b': index!==cartList.length-1}">
 						<view class="image-wrapper">
-							<image :src="item.image" :class="[item.loaded]" mode="aspectFill" lazy-load
-								@load="onImageLoad('cartList', index)" @error="onImageError('cartList', index)"></image>
+							<image :src="item.image" ></image>
 							<view class="yticon icon-xuanzhong2 checkbox" :class="{checked: item.checked}"
 								@click="check('item', index)"></view>
 						</view>
@@ -192,7 +191,20 @@
 			},
 			//创建订单
 			createOrder() {
-        uni.setStorageSync('orderData',JSON.stringify(this.cartList));
+        let list = [];
+        this.cartList.forEach(item => {
+          if (item.checked === true) {
+            list.push(item);
+          }
+        })
+        if(list.length===0){
+          uni.showToast({
+            title: '请选择商品',
+            icon: 'none'
+          })
+          return;
+        }
+        uni.setStorageSync('orderData',JSON.stringify(list));
 				uni.navigateTo({
 					url: `/pages/order/createOrder`
 				})
@@ -251,9 +263,12 @@
 			flex-shrink: 0;
 			position: relative;
 
-			image {
-				border-radius: 8upx;
-			}
+      image {
+        width: 100%;
+        height: 100%;
+        opacity: 1;
+        border-radius: 8upx;
+      }
 		}
 
 		.checkbox {

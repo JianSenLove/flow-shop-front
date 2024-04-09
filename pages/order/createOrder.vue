@@ -136,21 +136,20 @@
 					"status": "待付款",
 					"orderProducts": this.List
 				}
-				
-				createOrder(data);
 
         // 如果ID不为空,调用删除购物车接口
-        // if (this.list[0].id) {
-        //   for (let i = 0; i < this.list.length; i++) {
-        //     deleteCart(this.list[i].id);
-        //   }
-        // }
+        if (this.List[0].id) {
+          for (let i = 0; i < this.List.length; i++) {
+            deleteCart(this.List[i].id);
+          }
+        }
+				createOrder(data);
 
 				uni.showToast({
 					title:"订单创建成功"
 				})
 				
-				uni.navigateTo({
+				uni.redirectTo({
 					url: "/pages/order/order?state=1"
 				})
 			},

@@ -29,7 +29,7 @@ export const addCart = (cart) => {
 
 // 删除购物车商品
 export const deleteCart = (cartId) => {
-	return api.delete('/cart/delete/' + cartId);
+	return api.delete('/mirageLedger/v1/cart/' + cartId);
 };
 
 // 创建用户订单接口
