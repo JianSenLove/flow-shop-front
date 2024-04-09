@@ -140,7 +140,7 @@
 			    // 这里可以是跳转到订单创建界面的代码
 				let detailsArray = [];
 				this.detail.num = this.num;
-				this.detail.productId = this.detail.id;
+				this.detail.productId = this.id;
 				delete this.detail.id;
 				detailsArray.push(this.detail);
 				uni.setStorageSync('orderData', JSON.stringify(detailsArray));

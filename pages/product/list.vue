@@ -2,9 +2,6 @@
 	<view class="content">
 		<view class="search-section">
 			<uni-section>
-				<!-- 				<uni-search-bar placeholder="搜索商品" @confirm="search" :focus="true" v-model="searchValue" @blur="blur"
-					@focus="focus" @input="input" @cancel="cancel" @clear="clear">
-				</uni-search-bar> -->
 				<uni-search-bar placeholder="搜索商品" v-model="searchValue" @confirm="search" @cancel="cancel" @clear="cancel">
 				</uni-search-bar>
 
@@ -61,7 +58,7 @@
 		//下拉刷新
 		onPullDownRefresh() {
 			this.page = 1;
-			this.loadData('refresh');
+			this.loadData('refresh',this.searchValue);
 		},
 		//加载更多
 		onReachBottom() {
@@ -73,15 +70,8 @@
 				this.loadData('refresh');
 			},
 			search(res) {
-				uni.showToast({
-					title: '搜索：' + res.value,
-					icon: 'none'
-				})
 				this.loadData('refresh',this.searchValue);
 			},
-			input(res) {},
-			clear(res) {},
-			cancel(res) {},
 
 			async loadData(type = 'add', searchName = '') {
 				if (type === 'add' && this.loadingType === 'nomore') {
@@ -104,6 +94,13 @@
 					this.loadingType = response.records.length < 10 ? 'nomore' : 'more';
 				} else {
 					this.loadingType = 'nomore';
+          if (type === 'refresh') {
+            this.goodsList = [];
+            uni.showToast({
+              title: '没有更多了',
+              icon: 'none'
+            })
+          }
 				}
 
 				if (type === 'refresh') {

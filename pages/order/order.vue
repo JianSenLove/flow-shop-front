@@ -30,7 +30,7 @@
 								<text class="title clamp">{{ goodsItem.productName }}</text>
 								<text class="attr-box">
 									X {{goodsItem.num}}</text>
-								<text class="price">{{goodsItem.price}}</text>
+								<text class="price">{{goodsItem.price}} X {{goodsItem.num}} = ￥{{goodsItem.price * goodsItem.num}}</text>
 							</view>
 
 						</view>
@@ -38,10 +38,11 @@
 						<view class="price-box">
 							共
 							<text class="num">{{item.orderProducts.length}}</text>
-							件商品 实付款
+              <view v-if="item.status == '待付款'">件商品  待付款</view>
+              <view v-else>件商品  实付款</view>
 							<text class="price">{{pay(item.orderProducts)}}</text>
 						</view>
-						<view class="action-box b-t" v-if="item.order.status">
+						<view class="action-box b-t" v-if="item.status == '待付款'">
 							<button class="action-btn" @click="cancelOrder(item.order.id)">取消订单</button>
 							<button class="action-btn recom">立即支付</button>
 						</view>

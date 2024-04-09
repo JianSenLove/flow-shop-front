@@ -43,7 +43,7 @@
 		<view class="yt-list">
 			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">商品金额</text>
-				<text class="cell-tip">￥{{total}}</text>
+				<text class="cell-tip">￥{{price}}</text>
 			</view>
 			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">运费</text>
@@ -113,7 +113,7 @@
 
 				// 更新商品总金额
 				this.total = total;
-				this.price = parseFloat(this.total.toFixed(2));;
+				this.price = parseFloat(this.total.toFixed(2));
 			},
 			loadData() {
 
@@ -141,11 +141,11 @@
 				createOrder(data);
 				
 				uni.showToast({
-					title:"购买成功"
+					title:"订单创建成功"
 				})
 				
 				uni.navigateTo({
-					url: "/pages/order/order?state=2"
+					url: "/pages/order/order?state=1"
 				})
 			},
 
