@@ -79,3 +79,10 @@ export const updateAddress = (id, name, phone, address) => {
 export const deleteAddress = (id) => {
 	return api.delete('/address/' + id);
 };
+
+// 图片识别接口
+export const recognize = (imageFile) => {
+	const formData = new FormData();
+	formData.append('image', imageFile);
+	return api.imgPost('/mirageLedger/v1/product/classify', formData);
+};

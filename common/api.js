@@ -3,10 +3,10 @@ export const baseUrl = "http://127.0.0.1:8081";
 
 export default {
     // 通用请求方法，增加了401处理逻辑
-    request(method, url, param) {
+    request(method, url, param, headers) {
         return new Promise((resolve, reject) => {
             const token = uni.getStorageSync('token');
-            const headers = {
+            const headers = headers || {
                 'Content-Type': 'application/json',
             };
             if (token) {
@@ -67,4 +67,11 @@ export default {
     delete(url, params) {
         return this.request('DELETE', url, params);
     },
+    // 图片上传
+    imgPost(url, params) {
+        const headers = {
+            'Content-Type': 'multipart/form-data',
+        };
+        return this.request('POST', url, params, headers);
+    }
 };

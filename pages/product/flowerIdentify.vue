@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import { recognize } from '@/common/restApi.js';
 export default {
   data() {
     return {
@@ -46,26 +47,9 @@ export default {
         return;
       }
 
-      try {
-        const result = await this.recognize(this.imagePath);
-        this.resultName = result.name; // 假设recognize方法返回的对象中包含name属性
-      } catch (error) {
-        uni.showToast({
-          title: '识别失败',
-          icon: 'none',
-        });
-      }
-    },
-    // 模拟的recognize方法，你应该替换为你自己的实现
-    async recognize(imagePath) {
-      // 这里是你的recognize方法的实现
-      // 模拟一个异步请求的响应
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({ name: '不知名花种' });
-        }, 1000);
-      });
-    },
+      const result = await recognize(this.imagePath);
+      this.resultName = result;
+    }
   },
 };
 </script>

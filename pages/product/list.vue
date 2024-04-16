@@ -9,7 +9,6 @@
       <view class="history-section icon">
 
          <list-cell icon="icon-share" iconColor="#9789f7" title="花卉识别" @eventClick="identify" ></list-cell>
-         <list-cell icon="icon-pinglun-copy" iconColor="#ee883b" title="智能推荐" @eventClick="recommendation"></list-cell>
       </view>
 		</view>
 		<view class="goods-list">
@@ -117,14 +116,6 @@
 				uni.navigateTo({
 					url: '/pages/product/flowerIdentify'
 				})
-			},
-			// 智能推荐,调取接口获取新列表
-			async recommendation() {
-				// TODO 调整为推荐列表
-				let response = await getGoodsList({
-					page: this.page,
-					rows: 99
-				});
 			},
 			//详情
 			navToDetailPage(item) {
