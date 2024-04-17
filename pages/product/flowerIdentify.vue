@@ -10,7 +10,7 @@
       <button @click="recognizeImage" :disabled="!imagePath">识别图片</button>
     </view>
     <view class="result">
-      <text>{{ resultName }}</text>
+      <text>识别结果: {{ resultName }}</text>
     </view>
   </view>
 </template>
@@ -46,9 +46,23 @@ export default {
         });
         return;
       }
-
-      const result = await recognize(this.imagePath);
-      this.resultName = result;
+      uni.uploadFile({
+        url: 'http://127.0.0.1:8081/mirageLedger/v1/product/classify',
+        filePath: this.imagePath,
+        name: 'image',
+        header: { // 添加header属性
+          'Authorization': `Bearer ${uni.getStorageSync('token')}`,
+        },
+        success: (uploadFileRes) => {
+          this.resultName = uploadFileRes.data
+        },
+        fail: (error) => {
+          uni.showToast({
+            title: '识别失败',
+            icon: 'none',
+          });
+        },
+      });
     }
   },
 };

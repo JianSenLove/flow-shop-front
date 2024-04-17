@@ -82,7 +82,5 @@ export const deleteAddress = (id) => {
 
 // 图片识别接口
 export const recognize = (imageFile) => {
-	const formData = new FormData();
-	formData.append('image', imageFile);
-	return api.imgPost('/mirageLedger/v1/product/classify', formData);
+	return api.imgPost('/mirageLedger/v1/product/classify', imageFile);
 };
