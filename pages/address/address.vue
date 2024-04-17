@@ -20,7 +20,7 @@
 </template>
 
 <script>
-	import api from '../../common/api.js'
+  import {getAddressList,addAddress,updateAddress,deleteAddress} from '@/common/restApi.js'
 	export default {
 		data() {
 			return {
@@ -48,20 +48,10 @@
 		methods: {
 			
 			
-			list(){
-				api.post('Address/list', {uid:uni.getStorageSync('userInfo').id}).then(res => {
-					console.log(res)
-					if(res.code==200){
-						this.addressList=res.data
-					}else{
-						uni.showToast({
-							title: '获取失败',
-							icon: 'none'
-						});
-					}
-					
-				})
-			},
+			async list() {
+        const res = await getAddressList();
+        this.addressList = res.data;
+      },
 			
 			//选择地址
 			checkAddress(item){

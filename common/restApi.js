@@ -54,30 +54,22 @@ export const getOrderList = (params) => {
 
 // 查询用户收货地址接口
 export const getAddressList = () => {
-	return api.get('/address/list');
+	return api.get('/mirageLedger/v1/userAddress/list/');
 };
 
 // 添加收货地址接口
-export const addAddress = (name, phone, address) => {
-	return api.post('/address/add', {
-		name,
-		phone,
-		address
-	});
+export const createAddress = (data) => {
+	return api.post('/mirageLedger/v1/userAddress', data);
 };
 
 // 修改收货地址接口
-export const updateAddress = (id, name, phone, address) => {
-	return api.put('/address/update/' + id, {
-		name,
-		phone,
-		address
-	});
+export const updateAddress = (id, data) => {
+	return api.put('/mirageLedger/v1/userAddress/' + id, data);
 };
 
 // 删除收货地址接口
 export const deleteAddress = (id) => {
-	return api.delete('/address/' + id);
+	return api.delete('/mirageLedger/v1/userAddress/' + id);
 };
 
 // 图片识别接口
