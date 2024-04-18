@@ -40,17 +40,17 @@
 		},
 		onLoad(option){
 			this.source = option.source;
-			this.list();
 		},
 		onShow() {
-			
+      this.list();
 		},
 		methods: {
 			
 			
 			async list() {
         const res = await getAddressList();
-        this.addressList = res.data;
+        this.addressList = res
+        console.log(this.addressList);
       },
 			
 			//选择地址

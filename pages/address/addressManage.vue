@@ -20,7 +20,7 @@
 		
 		<view class="row default-row">
 			<text class="tit">设为默认</text>
-			<switch :checked="defaule" color="#fa436a" @change="switchChange" />
+			<switch :checked="isDefault" color="#fa436a" @change="switchChange" />
 		</view>
 		<button class="add-btn" @click="confirm">提交</button>
 	</view>
@@ -31,9 +31,9 @@ import {createAddress} from '@/common/restApi.js'
 	export default {
 		data() {
 			return {
-				defaule:false,
+        isDefault: false,
 				addressData: {
-					id:0,
+          id:'',
 					uid:uni.getStorageSync('userInfo').id,
 					name: '',
 					mobile: '',
@@ -50,7 +50,7 @@ import {createAddress} from '@/common/restApi.js'
 				
 				this.addressData = JSON.parse(option.data)
 				if(this.addressData.fault==1){
-					this.defaule=true
+					this.isDefault=true
 				}
 			}
 			this.manageType = option.type;
@@ -61,12 +61,12 @@ import {createAddress} from '@/common/restApi.js'
 		
 		methods: {
 			switchChange(e){
-				this.default = e.detail;
-				if(e.detail){
-					this.addressData.fault = 1;
-				}else{
-					this.addressData.fault = 0;
-				}
+        this.isDefault = e.detail;
+        if(this.isDefault === true){
+          this.addressData.fault = 1;
+        }else{
+          this.addressData.fault = 0;
+        }
 			},
 			
 			
@@ -93,12 +93,12 @@ import {createAddress} from '@/common/restApi.js'
 
         //this.$api.prePage()获取上一页实例，可直接调用上页所有数据和方法，在App.vue定义
 
-        await this.createAddress(data);
+        await createAddress(data);
         this.$api.prePage().refreshList(data, this.manageType);
         this.$api.msg(`地址${this.manageType == 'edit' ? '修改' : '添加'}成功`);
         setTimeout(() => {
           uni.navigateBack()
-        }, 800)
+        }, 300)
 
       },
 		}

@@ -27,10 +27,12 @@ const json = type=>{
 const prePage = ()=>{
 	let pages = getCurrentPages();
 	let prePage = pages[pages.length - 2];
-	// #ifdef H5
-	return prePage;
-	// #endif
-	return prePage.$vm;
+	if (prePage) {
+		return prePage.$vm;
+	} else {
+		// 如果没有找到前一个页面，可以返回 null 或者做其他处理
+		return null;
+	}
 }
 
 
