@@ -71,7 +71,7 @@
 
 <script>
 	import api from '../../common/api.js'
-	import {createOrder,deleteCart} from '@/common/restApi.js'
+	import {createOrder,deleteCart,getDefaultAddress} from '@/common/restApi.js'
 	export default {
 		data() {
 			return {
@@ -83,10 +83,11 @@
 				List: [],
 				price: 500, //应付金额
 				addressData: {
-					name: "张三",
-					mobile: "13800138000",
-					address: "某省某市某区某路某号",
-					area: "邮编100000"
+          id: '',
+					name: "",
+					mobile: "",
+					address: "",
+					area: ""
 				}
 			}
 		},
@@ -117,18 +118,24 @@
 			loadData() {
 
 			},
-			async address() {
-				// api.post('Address/molist', {"uid": this.userInfo.id }).then(res => {
-				// 	// console.log(res)
-				// 	if(res.data.length>0){
-				// 		this.addressData=res.data[0]
-				// 	}
-				// 	// addressData
-				// 	// console.log(res,res.data.length)
+      async address() {
+        let res = await getDefaultAddress();
+        if (!res) {
+          uni.showToast({
+            title: '您还没有收货地址，请先添加',
+            icon: 'none',
+            duration: 1000 // Toast显示时间，1000毫秒=1秒
+          });
 
-
-				// })
-			},
+          setTimeout(() => {
+            uni.navigateTo({
+              url: `/pages/address/addressManage?type=add`
+            })
+          }, 1000);
+        } else {
+          this.addressData = res;
+        }
+      },
 
 			submit() {
 				let data = {
@@ -143,47 +150,21 @@
             deleteCart(this.List[i].id);
           }
         }
+        data.addressId = this.addressData.id;
 				createOrder(data);
 
 				uni.showToast({
-					title:"订单创建成功"
+					title:"订单创建成功",
+          duration: 1000
 				})
-				
-				uni.redirectTo({
-					url: "/pages/order/order?state=1"
-				})
-			},
 
-			pay(id) {
-				let _this = this
-				api.post('Pay/getSign', {
-					"id": id
-				}).then(res => {
-					console.log(res)
-					uni.requestPayment({
-						provider: 'wxpay',
-						nonceStr: res.nonceStr,
-						package: res.package,
-						paySign: res.paySign,
-						signType: res.signType,
-						timeStamp: res.timeStamp,
-						success: function(res) {
-							console.log('success:' + JSON.stringify(res));
-							_this.$api.msg('支付成功')
-							setTimeout(() => {
-								uni.navigateTo({
-									url: "/pages/order/order?state=2"
-								})
-							}, 800)
-						},
-						fail: function(err) {
-							console.log('fail:' + JSON.stringify(err));
-
-						}
-					});
-
-				})
+        setTimeout(() => {
+          uni.redirectTo({
+            url: "/pages/order/order?state=1"
+          })
+        }, 1000);
 			}
+
 		}
 	}
 </script>

@@ -62,6 +62,11 @@ export const createAddress = (data) => {
 	return api.post('/mirageLedger/v1/userAddress', data);
 };
 
+// 查询默认收货地址接口
+export const getDefaultAddress = () => {
+	return api.get('/mirageLedger/v1/userAddress/default');
+};
+
 // 修改收货地址接口
 export const updateAddress = (id, data) => {
 	return api.put('/mirageLedger/v1/userAddress/' + id, data);
@@ -75,4 +80,8 @@ export const deleteAddress = (id) => {
 // 图片识别接口
 export const recognize = (imageFile) => {
 	return api.imgPost('/mirageLedger/v1/product/classify', imageFile);
+};
+
+export const createViewHistory = (params) => {
+	return api.post('/mirageLedger/v1/viewHistory',params);
 };

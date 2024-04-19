@@ -33,7 +33,7 @@
 <script>
 	import uniLoadMore from '@/components/uni-load-more/uni-load-more.vue';
 	import {
-		getGoodsList
+		getGoodsList,createViewHistory
 	} from '@/common/restApi.js';
   import listCell from "@/components/mix-list-cell.vue";
 	export default {
@@ -118,12 +118,16 @@
 				})
 			},
 			//详情
-			navToDetailPage(item) {
-				let id = item.id;
-				uni.navigateTo({
-					url: `/pages/product/product?id=${id}`
-				})
-			},
+			async navToDetailPage(item) {
+        let id = item.id;
+        let viewHistory = {
+          productId: item.id,
+        }
+        await createViewHistory(viewHistory);
+        uni.navigateTo({
+          url: `/pages/product/product?id=${id}`
+        })
+      },
 			stopPrevent() {}
 		},
 	}
