@@ -2,7 +2,7 @@
 	<view class="body">
 		<view class="header">
 			<view  class="order-status">
-				<text>{{orderInfo.status}}</text>
+				<text>{{orderInfo.order.status}}</text>
 			</view>
 			
 		</view>
@@ -11,10 +11,10 @@
 				<text class="yticon icon-shouhuodizhi"></text>
 				<view class="cen">
 					<view class="top">
-						<text class="name">{{orderInfo.order.receivingName}}</text>
-						<text class="mobile">{{orderInfo.order.receivingPhone}}</text>
+						<text class="name">{{orderInfo.userAddress.name}}</text>
+						<text class="mobile">{{orderInfo.userAddress.mobile}}</text>
 					</view>
-					<text class="address">{{orderInfo.order.receivingAddress}} </text>
+					<text class="address">{{orderInfo.userAddress.address}} </text>
 				</view>
 			</view>
 		</navigator>
@@ -23,40 +23,39 @@
 			
 			<!-- 商品列表 -->
 			<view class="g-item" v-for="(item, index) in orderInfo.goodsList" :key="index">
-				<image :src="item.ioc"></image>
+				<image :src="item.image"></image>
 				<view class="right">
-					<text class="title clamp">{{item.title}}</text>
-					<text class="spec">{{item.specsname}} / {{item.fitname}}</text>
+					<text class="title clamp">{{item.productName}}</text>
 					<view class="price-box">
 						<text class="price">￥{{item.price}}</text>
-						<text class="number">x {{item.mun}}</text>
+						<text class="number">x {{item.num}}</text>
 					</view>
 				</view>
 			</view>
 			<!--付款-->
 			<view class="pay-info" >
 				<text  class="pay-name">支付金额&emsp;</text>
-				<text class="pay-value">￥{{orderInfo.order.money}}</text>
+				<text class="pay-value">￥{{orderInfo.order.orderPrice}}</text>
 			</view>
 			
-			<view class="operation" v-if="orderInfo.order.pStatus>-1">
+			<view class="operation" v-if="orderInfo.order.status !== '已完成'">
 				<view class="action-box b-t">
-					<button class="action-btn"  v-if="orderInfo.order.pStatus === 0" @click="cancelOrder(orderInfo.order.id)">取消订单</button>
-					<button class="action-btn recom" v-if="orderInfo.order.pStatus === 0" @click="toPay(orderInfo.omsOrder.orderSn)">立即支付</button>
-					<button class="action-btn recom" v-if="orderInfo.order.pStatus === 2" @click="confirmReceipt(orderInfo.order.id)">确认收货</button>
-					<button class="action-btn recom" v-if="orderInfo.order.pStatus === 1 || orderInfo.order.pStatus === 2 || orderInfo.order.pStatus === 3" @click="shouhou(orderInfo.order.id)">申请售后</button>
+					<button class="action-btn"  v-if="orderInfo.order.status === '待付款'" @click="cancelOrder(orderInfo.order.id)">取消订单</button>
+					<button class="action-btn recom" v-if="orderInfo.order.status === '待付款'" @click="toPay(orderInfo.order.id)">立即支付</button>
+					<button class="action-btn recom" v-if="orderInfo.order.status === '待收货'" @click="confirmReceipt(orderInfo.order.id)">确认收货</button>
+					<button class="action-btn recom" v-if="orderInfo.order.status === '待收货' || orderInfo.order.status === '已完成' || orderInfo.order.status === '待发货'" @click="shouhou(orderInfo.order.id)">申请售后</button>
 				</view>
 			</view>
 		</view>
 
 		<view class="example-title">订单信息</view>
 		<view class="xianqg">
-			<view class="ordn">订单编号 : {{orderInfo.order.number}}</view>
-			<view class="ordn">创建时间 : {{orderInfo.order.ctime}}</view>
-			<view class="ordn" v-if="orderInfo.order.ptime">付款时间 : {{orderInfo.order.ptime}}</view>
-			<view class="ordn" v-if="orderInfo.order.expressName">物流公司 : {{orderInfo.order.expressName}}</view>
-			<view class="ordn" v-if="orderInfo.order.expressNumber">物流单号 : {{orderInfo.order.expressNumber}}</view>
-			<view class="ordn" v-if="orderInfo.order.ftime">发货时间 : {{orderInfo.order.ftime}}</view>
+			<view class="ordn">订单编号 : {{orderInfo.order.id}}</view>
+			<view class="ordn">创建时间 : {{orderInfo.order.createTime}}</view>
+<!--			<view class="ordn" v-if="orderInfo.order.ptime">付款时间 : {{orderInfo.order.ptime}}</view>-->
+<!--			<view class="ordn" v-if="orderInfo.order.expressName">物流公司 : {{orderInfo.order.expressName}}</view>-->
+<!--			<view class="ordn" v-if="orderInfo.order.expressNumber">物流单号 : {{orderInfo.order.expressNumber}}</view>-->
+<!--			<view class="ordn" v-if="orderInfo.order.ftime">发货时间 : {{orderInfo.order.ftime}}</view>-->
 		</view>
 		
 	</view>
@@ -64,15 +63,19 @@
 
 <script>
 	import listCell from '@/components/mix-list-cell';
-	import api from '../../common/api.js' 
-	export default { 
+  import {getOrderById, getAddressById, updateOrder} from "@/common/restApi";
+	export default {
 		omponents: {
 			listCell
 		},
 		data() {
 			return {
 				id:"",
-				orderInfo:null
+				orderInfo:{
+          order:{},
+          goodsList:[],
+          userAddress:{}
+        }
 			};
 		},
 		onLoad(option) {
@@ -93,72 +96,64 @@
 			}
 		},
 		methods:{
-			loadOrderInfo(){
-				api.post('Order/xcxlistData', {"id":this.id}).then(res => {
-					console.log(res.data)
-					if(res.code==200){
-						this.orderInfo=res.data
-					}
-					
-				})
-				
-			},
+			async loadOrderInfo() {
+        let res = await getOrderById(this.id);
+        console.log(res)
+        this.orderInfo.order = res
+        this.orderInfo.goodsList = res.orderProducts
+        this.orderInfo.userAddress = await getAddressById(res.addressId)
+      },
 			
 			//取消订单
 			cancelOrder(id){
-				var _self=this;
-				uni.showLoading({
-					title: '请稍后'
-				})
-				api.post('Order/qu', {"id":id}).then(res => {
-					console.log(res)
-					uni.hideLoading();
-					this.loadOrderInfo();
-				})
+        updateOrder(id,{status: "已取消"});
+        uni.showToast({
+          icon: 'success',
+					title: '取消订单成功'
+				});
+        this.orderInfo.order.status = "已取消";
 			},
-			toPay(orderSn){
-				uni.redirectTo({
-					url: '/pages/money/pay?orderSn='+orderSn
-				})
+			toPay(id){
+        updateOrder(id,{status: "待发货"})
+        uni.showToast({
+          title: '支付成功',
+          icon: 'success',
+          duration: 2000
+        });
+        this.orderInfo.order.status = "待发货";
+        // setTimeout(() => {
+        //   uni.redirectTo({
+        //     url: '/pages/order/order?state=3'
+        //   });
+        // }, 2000);
 			},
 			confirmReceipt(id){
-				var _self=this;
-				uni.showLoading({
-					title: '请稍后'
-				})
-				api.post('Order/shouhuo', {"id":id}).then(res => {
-					console.log(res)
-					uni.hideLoading();
-					this.loadOrderInfo();
-				})
+        updateOrder(id,{status: "已取消"});
+        uni.showToast({
+          icon: 'success',
+          title: '确认收货成功',
+          duration: 2000
+        });
+        this.orderInfo.order.status = "已完成";
+        // setTimeout(() => {
+        //   uni.redirectTo({
+        //     url: '/pages/order/order?state=0'
+        //   });
+        // }, 2000);
 			},
 			shouhou(id){
-				let _this = this
-				api.post('Pay/getSign', {"id":id}).then(res => {
-					console.log(res)
-					uni.requestPayment({
-						provider: 'wxpay',
-						nonceStr: res.nonceStr,
-						package: res.package,
-						paySign:res.paySign,
-						signType: res.signType,
-						timeStamp: res.timeStamp,
-						success: function(res) {
-							console.log('success:' + JSON.stringify(res));
-							_this.$api.msg('支付成功')
-							setTimeout(() => {
-								uni.navigateTo({
-									url:"/pages/order/order?state=2"
-								})
-							}, 800)
-						},
-						fail: function(err) {
-							console.log('fail:' + JSON.stringify(err));
-							
-						}
-					});
-					
-				})
+        updateOrder(id,{status: "售后"});
+        uni.showToast({
+          icon: 'success',
+          title: '售后处理成功',
+          duration: 2000
+        });
+        this.orderInfo.order.status = "售后";
+        // setTimeout(() => {
+        //   uni.redirectTo({
+        //     url: '/pages/order/order?state=4'
+        //   });
+        // }, 2000);
 			},
 		}
 	}

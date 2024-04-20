@@ -5,10 +5,10 @@
 			<image class="bg" src="/static/user-bg.jpg"></image>
 			<view class="user-info-box">
 				<view class="portrait-box">
-					<image class="portrait" :src="userInfo.logo || '/static/missing-face.png'"></image>
+					<image class="portrait" :src="userInfo.image || '/static/missing-face.png'"></image>
 				</view>
 				<view class="info-box">
-					<text class="username" v-if="userInfo">{{userInfo.name}}</text>
+					<text class="username" >{{userInfo.name}}</text>
 					<button class="topright"  open-type="getUserProfile" lang="zh_CN" @tap="wxGetUserInfo" v-if="!userInfo">立即登录</button>
 				</view>
 			</view>
@@ -69,10 +69,10 @@
 		
     </view>  
 </template>  
-<script>  
-	import listCell from '@/components/mix-list-cell';
-	import api from '../../common/api.js'
-	let startY = 0, moveY = 0, pageAtTop = true;
+<script>
+import listCell from '@/components/mix-list-cell';
+
+let startY = 0, moveY = 0, pageAtTop = true;
     export default {
 		components: {
 			listCell
@@ -82,16 +82,14 @@
 				coverTransform: 'translateY(0px)',
 				coverTransition: '0s',
 				moving: false,
-				userInfo:null,
+				userInfo:{},
 				xcxcode: '',//获取登录用户的code
 			}
 		},
 		onLoad(){
-			// console.log(userInfo)
+      this.userInfo=JSON.parse(uni.getStorageSync('userInfo'));
 		},
 		onShow() {
-			let userInfo = uni.getStorageSync('userInfo');
-			this.userInfo=userInfo;
 		},
 		
         
@@ -126,65 +124,6 @@
 						}
 					}
 				});
-			},
-			onShareAppMessage:function(res) {
-				console.log(1)
-				return {
-					title:'ALAPI',
-					path:'/pages/index/index',
-					imageUrl:'',
-					desc:'',
-					content:'',
-					success(res){
-						uni.showToast({
-							title:'分享成功'
-						})
-					},
-					fail(res){
-						uni.showToast({
-							title:'分享失败',
-							icon:'none'
-						})
-					}
-				}
-			},
-			/**
-			 *  会员卡下拉和回弹
-			 *  1.关闭bounce避免ios端下拉冲突
-			 *  2.由于touchmove事件的缺陷（以前做小程序就遇到，比如20跳到40，h5反而好很多），下拉的时候会有掉帧的感觉
-			 *    transition设置0.1秒延迟，让css来过渡这段空窗期
-			 *  3.回弹效果可修改曲线值来调整效果，推荐一个好用的bezier生成工具 http://cubic-bezier.com/
-			 */
-			coverTouchstart(e){
-				if(pageAtTop === false){
-					return;
-				}
-				this.coverTransition = 'transform .1s linear';
-				startY = e.touches[0].clientY;
-			},
-			coverTouchmove(e){
-				moveY = e.touches[0].clientY;
-				let moveDistance = moveY - startY;
-				if(moveDistance < 0){
-					this.moving = false;
-					return;
-				}
-				this.moving = true;
-				if(moveDistance >= 80 && moveDistance < 100){
-					moveDistance = 80;
-				}
-		
-				if(moveDistance > 0 && moveDistance <= 80){
-					this.coverTransform = `translateY(${moveDistance}px)`;
-				}
-			},
-			coverTouchend(){
-				if(this.moving === false){
-					return;
-				}
-				this.moving = false;
-				this.coverTransition = 'transform 0.3s cubic-bezier(.21,1.93,.53,.64)';
-				this.coverTransform = 'translateY(0px)';
 			}
         }  
     }  

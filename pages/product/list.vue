@@ -59,6 +59,10 @@
 			this.loadData();
 			this.loadingType = 'noMore';
 		},
+    onShow() {
+      this.loadData();
+      this.loadingType = 'noMore';
+    },
 		//下拉刷新
 		onPullDownRefresh() {
 			this.page = 1;

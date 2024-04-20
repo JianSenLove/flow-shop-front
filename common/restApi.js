@@ -37,6 +37,11 @@ export const createOrder = (order) => {
 	return api.post('/mirageLedger/v1/order', order);
 };
 
+// 获取用户订单接口
+export const getOrderById = (id) => {
+	return api.get('/mirageLedger/v1/order/' + id);
+};
+
 // 修改用户订单接口
 export const updateOrder = (id,order) => {
 	return api.put('/mirageLedger/v1/order/' + id, order);
@@ -65,6 +70,10 @@ export const createAddress = (data) => {
 // 查询默认收货地址接口
 export const getDefaultAddress = () => {
 	return api.get('/mirageLedger/v1/userAddress/default');
+};
+
+export const getAddressById = (id) => {
+	return api.get('/mirageLedger/v1/userAddress/' + id);
 };
 
 // 修改收货地址接口

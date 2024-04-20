@@ -13,8 +13,10 @@
 				<view class="t-list">
 					<view @click="navToList(titem.id)" v-if="titem.categoryId === item.id" class="t-item"
 						v-for="titem in tlist" :key="titem.id">
-						<image :src="titem.image"></image>
-						<text>{{titem.name}}</text>
+            <view @click="goToDetail(titem.id)" class="t-item">
+              <image :src="titem.image"></image>
+              <text>{{titem.name}}</text>
+            </view>
 					</view>
 				</view>
 			</view>
@@ -23,9 +25,10 @@
 </template>
 
 <script>
-	import {
-		getCategoryList
-	} from '@/common/restApi.js'
+import {
+  createViewHistory,
+  getCategoryList
+} from '@/common/restApi.js'
 	export default {
 		data() {
 			return {
@@ -115,7 +118,16 @@
 				uni.navigateTo({
 					url: `/pages/product/list?sid=${sid}&tid=0`
 				})
-			}
+			},
+      async goToDetail(id) {
+        let viewHistory = {
+          productId: id,
+        }
+        await createViewHistory(viewHistory);
+        uni.navigateTo({
+          url: `/pages/product/product?id=${id}`
+        })
+      }
 		}
 	}
 </script>
