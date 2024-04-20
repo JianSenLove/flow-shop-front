@@ -32,6 +32,11 @@ export const deleteCart = (cartId) => {
 	return api.delete('/mirageLedger/v1/cart/' + cartId);
 };
 
+// 清空购物车商品
+export const clearCart = () => {
+	return api.delete('/mirageLedger/v1/cart/all');
+};
+
 // 创建用户订单接口
 export const createOrder = (order) => {
 	return api.post('/mirageLedger/v1/order', order);

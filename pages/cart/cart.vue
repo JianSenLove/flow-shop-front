@@ -56,7 +56,7 @@
 </template>
 
 <script>
-	import {getCartList} from '@/common/restApi.js'
+	import {getCartList,deleteCart,clearCart} from '@/common/restApi.js'
 	import uniNumberBox from '@/components/uni-number-box.vue'
 	export default {
 		components: {
@@ -143,9 +143,19 @@
 				let row = list[index];
 				let id = row.id;
 				// 调用接口删除id
+        deleteCart(id);
+        this.total = 0;
 				this.cartList.splice(index, 1);
+        if (list.length === 0) {
+          this.empty = true;
+          // this.total = 0;
+        }
 				this.calcTotal();
 				uni.hideLoading();
+        uni.showToast({
+					title: '删除成功',
+					icon: 'success'
+				});
 			},
 			//清空
 			clearCart() {
@@ -163,9 +173,14 @@
 
 							}
 							// 调用接口清除购物车
+              clearCart();
 							this.cartList = [];
 							this.total = 0;
 							this.calcTotal();
+              uni.showToast({
+								title: '清空成功',
+								icon: 'success'
+							});
 						}
 					}
 				})
