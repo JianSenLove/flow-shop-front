@@ -26,9 +26,6 @@
 				transform: coverTransform,
 				transition: coverTransition
 			}]"
-			@touchstart="coverTouchstart"
-			@touchmove="coverTouchmove"
-			@touchend="coverTouchend"
 		>
 			<image class="arc" src="/static/arc.png"></image>
 			
